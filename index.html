@@ -1,0 +1,3594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TYP Championship</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07041a;
+  --bg2: #0d0825;
+  --bg3: #130d35;
+  --card: #160f3a;
+  --card2: #1c1448;
+  --border: #2d1f6e;
+  --gold: #7c5cfc;
+  --gold2: #a78bfa;
+  --cyan: #60a5fa;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #a78bfa;
+  --text: #ede9fe;
+  --text2: #a5b4fc;
+  --text3: #6d5fa8;
+  --accent1: #7c3aed;
+  --accent2: #3b82f6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BG GRID */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96,165,250,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* PAGES */
+.page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+.page.active { display: block; }
+
+/* ADMIN PANEL */
+.admin-wrap { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.admin-title { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; color: var(--gold); letter-spacing: 2px; }
+.admin-badge { background: rgba(255,71,87,0.15); border: 1px solid var(--red); color: var(--red); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+.admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.admin-tab { padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.admin-tab.active, .admin-tab:hover { background: var(--accent1); color: #fff; border-color: var(--accent1); }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+.player-admin-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.player-admin-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--bg3); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; flex-shrink: 0; }
+.player-admin-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.player-admin-info { flex: 1; min-width: 120px; }
+.player-admin-name { font-weight: 700; font-size: 15px; color: var(--text); }
+.player-admin-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.player-admin-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-admin-edit { background: rgba(0,212,255,0.1); border: 1px solid var(--cyan); color: var(--cyan); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-admin-edit:hover { background: var(--cyan); color: #000; }
+.btn-admin-del { background: rgba(255,71,87,0.1); border: 1px solid var(--red); color: var(--red); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-admin-del:hover { background: var(--red); color: #fff; }
+.stats-edit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
+.stats-edit-item label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 4px; font-weight: 600; letter-spacing: 1px; }
+.stats-edit-item input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 14px; }
+.stats-edit-item input:focus { outline: none; border-color: var(--cyan); }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: var(--card2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; color: var(--cyan); margin-bottom: 20px; }
+.admin-login-box { max-width: 380px; margin: 60px auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; }
+.admin-login-title { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--red); text-align: center; margin-bottom: 24px; letter-spacing: 2px; }
+.match-add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:600px){ .match-add-grid { grid-template-columns: 1fr; } }
+
+/* NAV */
+nav {
+  background: rgba(6,13,26,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.nav-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.nav-logo span { color: var(--cyan); }
+
+.nav-links { display: flex; gap: 6px; align-items: center; }
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  background: var(--bg3);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.nav-btn.primary {
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  border-color: var(--accent1);
+  color: #fff;
+  font-weight: 700;
+}
+
+.nav-btn.primary:hover { background: linear-gradient(135deg, #6d28d9, #2563eb); }
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 80px 20px 60px;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(124,92,252,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--cyan);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.hero h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(36px, 8vw, 72px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero h1 .gold { color: var(--gold); }
+.hero h1 .cyan { color: var(--cyan); }
+
+.hero p {
+  color: var(--text2);
+  font-size: 16px;
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--accent1), #5b21b6);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(124,92,252,0.4);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(124,92,252,0.6);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+}
+
+.btn-outline:hover {
+  background: rgba(0,212,255,0.1);
+  transform: translateY(-2px);
+}
+
+.btn-outline-gold {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+
+.btn-outline-gold:hover {
+  background: rgba(245,166,35,0.1);
+}
+
+/* STATS BAR */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: 40px auto;
+  max-width: 700px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 20px 10px;
+  border-right: 1px solid var(--border);
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* SECTION */
+.section { padding: 40px 20px; max-width: 1100px; margin: 0 auto; }
+.section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.section-sub {
+  color: var(--text3);
+  font-size: 13px;
+  margin-bottom: 24px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: rgba(0,212,255,0.3); }
+
+/* AUTH PAGES */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+.auth-wrap::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.auth-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent1), var(--accent2), transparent);
+  border-radius: 16px 16px 0 0;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo h2 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.auth-logo p { color: var(--text3); font-size: 13px; margin-top: 4px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-input:focus { border-color: var(--cyan); }
+.form-input::placeholder { color: var(--text3); }
+
+select.form-input {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234a6fa5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+select.form-input option { background: var(--card); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.form-hint { font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+.form-divider {
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+  margin: 20px 0;
+  position: relative;
+}
+
+.form-divider::before, .form-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border);
+}
+
+.form-divider::before { left: 0; }
+.form-divider::after { right: 0; }
+
+.form-link {
+  color: var(--cyan);
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.form-link:hover { opacity: 0.7; }
+
+.btn-full { width: 100%; padding: 13px; font-size: 15px; }
+
+/* AVATAR UPLOAD */
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.avatar-preview:hover { border-color: var(--cyan); }
+.avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-info p { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.avatar-info span { font-size: 11px; color: var(--text3); }
+
+/* ERROR / SUCCESS */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.alert.show { display: block; }
+.alert-error { background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.3); color: #ff6b7a; }
+.alert-success { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.3); color: #00e676; }
+
+/* SPINNER */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* PROFILE PAGE */
+.profile-hero {
+  background: linear-gradient(180deg, var(--bg3) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 20px;
+}
+
+.profile-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--accent1);
+  background: var(--card);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: 0 0 30px rgba(124,92,252,0.3);
+}
+
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.profile-info { flex: 1; }
+
+.profile-rank {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.profile-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.profile-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.profile-meta span { display: flex; align-items: center; gap: 5px; }
+
+.form-badge {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.badge-w { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+.badge-d { background: rgba(255,209,102,0.15); color: var(--yellow); border: 1px solid rgba(255,209,102,0.3); }
+.badge-l { background: rgba(255,71,87,0.15); color: var(--red); border: 1px solid rgba(255,71,87,0.3); }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  border-color: rgba(0,212,255,0.3);
+  transform: translateY(-2px);
+}
+
+.stat-card-num {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text3);
+  padding: 10px 18px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.tab-btn.active {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* LOADING */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.4s;
+}
+
+.loading-logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  animation: loadbar 1.5s ease-in-out infinite;
+}
+
+@keyframes loadbar {
+  0% { width: 0; margin-left: 0; }
+  50% { width: 100%; margin-left: 0; }
+  100% { width: 0; margin-left: 100%; }
+}
+
+/* USER MENU */
+.user-menu { position: relative; }
+
+.user-avatar-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card2);
+  border: 2px solid var(--accent1);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.user-avatar-btn:hover { border-color: var(--cyan); }
+.user-avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  min-width: 180px;
+  display: none;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.user-dropdown.show { display: block; }
+
+.dropdown-item {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover { background: var(--bg3); color: var(--text); }
+.dropdown-item.danger { color: var(--red); }
+.dropdown-item.danger:hover { background: rgba(255,71,87,0.1); }
+
+.dropdown-user {
+  padding: 10px 14px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.dropdown-user-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.dropdown-user-club { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  /* Auth */
+  .auth-box { padding: 24px 16px; }
+  .form-row { grid-template-columns: 1fr; }
+
+  /* Nav */
+  .nav-links { display: none; }
+  .main-nav { padding: 0 12px; height: 52px; }
+
+  /* Page */
+  .page { padding: 16px 12px 80px; }
+  body { padding-bottom: 62px; }
+
+  /* Stats bar */
+  .stats-bar { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat-item:nth-child(odd) { border-right: 1px solid var(--border); }
+  .stat-item:last-child, .stat-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+
+  /* Profile */
+  .profile-inner { flex-direction: column; align-items: flex-start; }
+
+  /* Section */
+  .section { padding: 0; }
+  .section-title { font-size: 20px; }
+
+  /* Cards */
+  .card { padding: 14px 12px; border-radius: 10px; }
+
+  /* Buttons */
+  .btn { padding: 10px 14px; font-size: 13px; }
+
+  /* Tables - horizontal scroll */
+  .table-wrap, [style*="overflow-x:auto"] { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Tabs */
+  .tabs { gap: 4px; }
+  .tab-btn { padding: 8px 12px; font-size: 12px; }
+
+  /* Form inputs */
+  .form-input { font-size: 15px; padding: 11px 14px; }
+
+  /* Hero */
+  .hero-title { font-size: clamp(36px, 12vw, 80px); }
+  .hero-btns { flex-direction: column; gap: 10px; align-items: stretch; }
+  .hero-btns .btn { text-align: center; }
+
+  /* Modal */
+  .modal-box { margin: 10px; max-width: calc(100vw - 20px) !important; max-height: 90vh; overflow-y: auto; }
+
+  /* Player ranking table - hide less important cols */
+  .rank-col-hide { display: none; }
+
+  /* Admin panel */
+  .admin-tabs { flex-wrap: wrap; gap: 6px; }
+  .admin-tab-btn { padding: 8px 10px; font-size: 12px; }
+
+  /* Friendly zone */
+  .friendly-tabs { gap: 0; }
+  .friendly-tab { padding: 10px 8px; font-size: 11px; }
+}
+
+/* BOTTOM NAV - mobile only */
+.bottom-nav {
+  display: none;
+}
+.loading-active .bottom-nav {
+  display: none !important;
+}
+@media (max-width: 600px) {
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0 !important;
+    top: auto !important;
+    left: 0; right: 0;
+    height: 64px;
+    background: rgba(7,4,26,0.98);
+    border-top: 1px solid var(--border);
+    z-index: 9999;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    justify-content: space-around;
+    align-items: center;
+    padding: 0;
+    box-shadow: 0 -4px 24px rgba(124,92,252,0.15);
+  }
+  .bottom-nav.nav-hidden {
+    display: none !important;
+  }
+  .bnav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0;
+    transition: color 0.15s;
+    padding: 8px 2px;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+  .bnav-btn .bnav-icon { font-size: 20px; line-height: 1; display: block; }
+  .bnav-btn.active, .bnav-btn:active { color: var(--gold2); }
+  .bnav-btn.active .bnav-icon { filter: drop-shadow(0 0 8px var(--accent1)); }
+  /* loading screen fix */
+  .loading-screen { align-items: center !important; justify-content: center !important; }
+}
+
+/* ── ENHANCED MOBILE IMPROVEMENTS ── */
+@media (max-width: 480px) {
+  /* Better touch targets */
+  .btn { min-height: 46px; padding: 12px 18px; font-size: 13px; }
+  .form-input { min-height: 48px; font-size: 16px !important; }
+
+  /* Stat bar 2x2 grid on very small screens */
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .stat-num { font-size: 22px; }
+  .stat-item { padding: 14px 8px; }
+
+  /* Hero tighter spacing */
+  .hero { padding: 50px 16px 30px; }
+  .hero p { font-size: 14px; }
+
+  /* Card tighter */
+  .card { padding: 12px 10px; }
+
+  /* Profile name smaller */
+  .profile-name { font-size: 26px; }
+
+  /* Section titles */
+  .section-title { font-size: 18px; letter-spacing: 1px; }
+
+  /* Modal full width */
+  .modal-box { padding: 20px 14px; border-radius: 12px; }
+  .modal-title { font-size: 17px; }
+
+  /* Tab buttons scrollable row */
+  .tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .tab-btn { white-space: nowrap; }
+
+  /* Admin tabs wrap properly */
+  .admin-tabs { gap: 6px; }
+
+  /* Bottom nav slightly taller */
+  .bottom-nav { height: 64px; }
+  body { padding-bottom: 64px; }
+}
+
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-16 { margin-top: 16px; }
+.mt-8 { margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">TYP ⚡</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  <p style="color:var(--text3);font-size:13px;margin-top:16px;font-family:'Share Tech Mono',monospace;">INITIALIZING...</p>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav nav-hidden" id="bottomNav">
+  <button class="bnav-btn active" id="bnav-home" onclick="showPage('home');setBottomNav('home')">
+    <span class="bnav-icon">🏠</span>Home
+  </button>
+  <button class="bnav-btn" id="bnav-ranking" onclick="showPage('ranking');setBottomNav('ranking')">
+    <span class="bnav-icon">🏆</span>Ranking
+  </button>
+  <button class="bnav-btn" id="bnav-matches" onclick="showPage('matches');setBottomNav('matches')">
+    <span class="bnav-icon">⚽</span>Matches
+  </button>
+  <button class="bnav-btn" id="bnav-friendly" onclick="showPage('friendly');setBottomNav('friendly')">
+    <span class="bnav-icon">🤝</span>Friendly
+  </button>
+  <button class="bnav-btn" id="bnav-profile" onclick="bnavProfile()">
+    <span class="bnav-icon" id="bnavProfileIcon">👤</span>Profile
+  </button>
+</nav>
+
+<!-- NAV -->
+<nav id="mainNav" class="hidden">
+  <div class="nav-logo" onclick="showPage('home')">⚡ <span>TYP</span> CHAMPIONSHIP</div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('ranking')">🏆 Ranking</button>
+    <button class="nav-btn" onclick="showPage('matches')">⚽ Matches</button>
+    <button class="nav-btn" onclick="showPage('friendly')" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
+    <!-- Guest buttons -->
+    <span id="guestNav">
+      <button class="nav-btn" onclick="showPage('login')">Login</button>
+      <button class="nav-btn primary" onclick="showPage('register')">Register</button>
+    </span>
+    <!-- User menu -->
+    <span id="userNav" class="hidden">
+      <div class="user-menu">
+        <div class="user-avatar-btn" onclick="toggleDropdown()" id="navAvatarBtn">👤</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-user">
+            <div class="dropdown-user-name" id="dropdownName">Player</div>
+            <div class="dropdown-user-club" id="dropdownClub">Club</div>
+          </div>
+          <div class="dropdown-item" onclick="showPage('profile')">👤 My Profile</div>
+          <div class="dropdown-item" onclick="showPage('editProfile')">✏️ Edit Profile</div>
+          <div class="dropdown-item" id="adminNavLink" style="display:none" onclick="showPage('admin')">🛡️ Admin Panel</div>
+          <div class="dropdown-item danger" onclick="logout()">🚪 Logout</div>
+        </div>
+      </div>
+    </span>
+  </div>
+</nav>
+
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">🏆 Season 2026 • Active</div>
+    <h1><span class="gold">TYP</span> <span class="cyan">CHAMPIONSHIP</span></h1>
+    <p>Bangladesh-এর সেরা eFootball community। খেলো, জেতো, legend হও।</p>
+    <div class="hero-btns" id="heroBtns">
+      <button class="btn btn-gold" onclick="showPage('register')">🚀 Join Now</button>
+      <button class="btn btn-outline" onclick="showPage('ranking')">🏆 Leaderboard</button>
+    </div>
+
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num" id="statPlayers">—</div>
+        <div class="stat-label">Players</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="statMatches">—</div>
+        <div class="stat-label">Matches</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="statClubs">—</div>
+        <div class="stat-label">Clubs</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="statSeason">S1</div>
+        <div class="stat-label">Season</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP PLAYERS -->
+  <div class="section" style="padding-top:0">
+    <div class="section-title">🏅 Top Players</div>
+    <div class="section-sub">// Career Score অনুযায়ী সেরা players</div>
+    <div id="homeTopPlayers" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px">
+      <div style="text-align:center;padding:30px;color:var(--text3)"><span class="spinner"></span></div>
+    </div>
+  </div>
+
+  <!-- RECENT MATCH RESULTS -->
+  <div class="section" style="padding-top:0">
+    <div class="section-title">⚽ Recent Results</div>
+    <div class="section-sub">// সর্বশেষ match results</div>
+    <div id="homeRecentMatches">
+      <div style="text-align:center;padding:30px;color:var(--text3)"><span class="spinner"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ REGISTER PAGE ═══════════════ -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <h2>⚡ TYP</h2>
+        <p>নতুন account তৈরি করুন</p>
+      </div>
+
+      <div class="alert alert-error" id="regError"></div>
+      <div class="alert alert-success" id="regSuccess"></div>
+
+      <!-- Avatar -->
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="avatarPreview" onclick="document.getElementById('avatarInput').click()">🎮</div>
+        <div class="avatar-info">
+          <p>Profile Photo</p>
+          <span>Click করে photo upload করুন</span>
+          <br><span style="color:var(--text3);font-size:10px;">Max 2MB • JPG, PNG</span>
+        </div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-input" id="regName" placeholder="তোমার নাম">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username *</label>
+          <input type="text" class="form-input" id="regUsername" placeholder="unique username" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+          <div class="form-hint" id="usernameHint"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" class="form-input" id="regEmail" placeholder="email@example.com">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Club Name *</label>
+          <input type="text" class="form-input" id="regClub" placeholder="তোমার club">
+        </div>
+        <div class="form-group">
+          <label class="form-label">District *</label>
+          <select class="form-input" id="regDistrict">
+            <option value="">Select District</option>
+            <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+            <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+            <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+            <option>Narayanganj</option><option>Gazipur</option><option>Tangail</option>
+            <option>Bogura</option><option>Jessore</option><option>Dinajpur</option>
+            <option>Faridpur</option><option>Pabna</option><option>Noakhali</option>
+            <option>Cox's Bazar</option><option>Brahmanbaria</option><option>Feni</option>
+            <option>Lakshmipur</option><option>Chandpur</option><option>Narsingdi</option>
+            <option>Munshiganj</option><option>Manikganj</option><option>Shariatpur</option>
+            <option>Madaripur</option><option>Gopalganj</option><option>Narail</option>
+            <option>Magura</option><option>Jhenaidah</option><option>Chuadanga</option>
+            <option>Kushtia</option><option>Meherpur</option><option>Satkhira</option>
+            <option>Bagerhat</option><option>Pirojpur</option><option>Patuakhali</option>
+            <option>Barguna</option><option>Bhola</option><option>Jhalokathi</option>
+            <option>Kishoreganj</option><option>Netrokona</option><option>Jamalpur</option>
+            <option>Sherpur</option><option>Sunamganj</option><option>Habiganj</option>
+            <option>Moulvibazar</option><option>Kurigram</option><option>Gaibandha</option>
+            <option>Lalmonirhat</option><option>Nilphamari</option><option>Panchagarh</option>
+            <option>Thakurgaon</option><option>Joypurhat</option><option>Naogaon</option>
+            <option>Chapainawabganj</option><option>Natore</option><option>Sirajganj</option>
+            <option>Rajbari</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" class="form-input" id="regPass" placeholder="Min 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" class="form-input" id="regPass2" placeholder="Repeat password">
+        </div>
+      </div>
+
+      <button class="btn btn-gold btn-full" onclick="register()" id="regBtn">
+        🚀 Create Account
+      </button>
+
+      <div class="form-divider">or</div>
+      <div class="text-center">
+        Already have account? <span class="form-link" onclick="showPage('login')">Login করুন</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <h2>⚡ TYP</h2>
+        <p>আপনার account-এ login করুন</p>
+      </div>
+
+      <div class="alert alert-error" id="loginError"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="email@example.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+        <div class="mt-8 text-center">
+          <span class="form-link" onclick="resetPassword()" style="font-size:12px;">🔑 Forgot password?</span>
+        </div>
+      </div>
+
+      <button class="btn btn-gold btn-full" onclick="login()" id="loginBtn">
+        ⚡ Login
+      </button>
+
+      <div class="form-divider">or</div>
+      <div class="text-center">
+        Account নেই? <span class="form-link" onclick="showPage('register')">Register করুন</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PROFILE PAGE ═══════════════ -->
+<div class="page" id="page-profile">
+  <div class="profile-hero">
+    <div class="profile-inner">
+      <div class="profile-avatar" id="profileAvatar">🎮</div>
+      <div class="profile-info">
+        <div class="profile-rank" id="profileRank"># — • TYP PLAYER</div>
+        <div class="profile-name" id="profileName">Player Name</div>
+        <div class="profile-meta">
+          <span>🏟️ <span id="profileClub">—</span></span>
+          <span>📍 <span id="profileDistrict">—</span></span>
+          <span>📅 <span id="profileJoined">—</span></span>
+        </div>
+        <div class="form-badge" id="profileForm"></div>
+      </div>
+      <button class="btn btn-outline-gold" onclick="showPage('editProfile')" style="align-self:flex-start">✏️ Edit</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <!-- Stats -->
+    <div class="stats-grid" id="profileStats">
+      <div class="stat-card"><div class="stat-card-num" id="pM">—</div><div class="stat-card-label">Matches</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pW">—</div><div class="stat-card-label">Wins</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pD">—</div><div class="stat-card-label">Draws</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pL">—</div><div class="stat-card-label">Losses</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pWP">—</div><div class="stat-card-label">Win %</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pGF">—</div><div class="stat-card-label">Goals For</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pGA">—</div><div class="stat-card-label">Goals Against</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pCS">—</div><div class="stat-card-label">Clean Sheets</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pMOTM">—</div><div class="stat-card-label">MOTM</div></div>
+      <div class="stat-card"><div class="stat-card-num" id="pPTS" style="color:var(--cyan)">—</div><div class="stat-card-label">Points</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+      <button class="tab-btn" onclick="switchTab('achievements')">Achievements</button>
+      <button class="tab-btn" onclick="switchTab('friendly')">🤝 Friendly</button>
+    </div>
+
+    <div class="tab-content active" id="tab-overview">
+      <div class="card">
+        <div id="noStatsMsg" style="text-align:center;color:var(--text3);padding:40px 0;">
+          <div style="font-size:48px;margin-bottom:12px">📊</div>
+          <p>Stats এখনও নেই।</p>
+          <p style="font-size:13px;margin-top:6px">Admin stats update করলে এখানে দেখাবে।</p>
+        </div>
+        <div id="statsDetail" class="hidden">
+          <div style="color:var(--text2);font-size:14px;line-height:2">
+            <div>🎯 <strong>Win Rate:</strong> <span id="detWR">—</span></div>
+            <div>⚽ <strong>Avg Goals/Match:</strong> <span id="detAvgG">—</span></div>
+            <div>🛡️ <strong>Clean Sheet Rate:</strong> <span id="detCSR">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-achievements">
+      <div id="achievementsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px"></div>
+    </div>
+
+    <div class="tab-content" id="tab-friendly">
+      <div id="friendlyMatchesList"><div style="text-align:center;color:var(--text3);padding:40px 0">🤝 কোনো friendly match নেই।</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ EDIT PROFILE PAGE ═══════════════ -->
+<div class="page" id="page-editProfile">
+  <div class="auth-wrap">
+    <div class="auth-box" style="max-width:500px">
+      <div class="auth-logo">
+        <h2>✏️ Edit Profile</h2>
+        <p>তোমার তথ্য আপডেট করো</p>
+      </div>
+      <div class="alert alert-error" id="editError"></div>
+      <div class="alert alert-success" id="editSuccess"></div>
+
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="editAvatarPreview" onclick="document.getElementById('editAvatarInput').click()">🎮</div>
+        <div class="avatar-info">
+          <p>Click করে photo change করুন</p>
+        </div>
+      </div>
+      <input type="file" id="editAvatarInput" accept="image/*" style="display:none" onchange="previewEditAvatar(this)">
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="editName">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Club Name</label>
+          <input type="text" class="form-input" id="editClub">
+        </div>
+        <div class="form-group">
+          <label class="form-label">District</label>
+          <select class="form-input" id="editDistrict">
+            <option value="">Select</option>
+            <option>Dhaka</option><option>Chittagong</option><option>Sylhet</option>
+            <option>Rajshahi</option><option>Khulna</option><option>Barishal</option>
+            <option>Rangpur</option><option>Mymensingh</option><option>Comilla</option>
+            <option>Narayanganj</option><option>Gazipur</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-gold" style="flex:1" onclick="saveProfile()">💾 Save</button>
+        <button class="btn btn-outline" style="flex:1" onclick="showPage('profile')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PUBLIC PROFILE MODAL ═══════════════ -->
+<div class="modal-overlay" id="publicProfileModal">
+  <div class="modal-box" style="max-width:520px;padding:0;overflow:hidden">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,var(--bg3),var(--card2));padding:28px 24px 20px;border-bottom:1px solid var(--border);position:relative">
+      <button onclick="closePublicProfile()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+      <button onclick="downloadStatsCard()" id="ppDownloadBtn" style="position:absolute;top:14px;right:52px;background:linear-gradient(135deg,var(--accent1),var(--accent2));border:none;color:#fff;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:5px;font-family:'Exo 2',sans-serif">⬇ CARD</button>
+      <div style="display:flex;align-items:center;gap:18px">
+        <div id="ppAvatar" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;box-shadow:0 0 20px rgba(245,166,35,0.2)">🎮</div>
+        <div>
+          <div id="ppRank" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:4px"></div>
+          <div id="ppName" style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.1"></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--text2)">
+            <span>🏟️ <span id="ppClub">—</span></span>
+            <span>📍 <span id="ppDistrict">—</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div style="padding:20px 24px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:var(--bg3);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppM" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">MATCHES</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppW" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">WINS</div>
+        </div>
+        <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppD" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--yellow)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">DRAWS</div>
+        </div>
+        <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppL" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--red)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">LOSSES</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="background:var(--bg3);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppGoals" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--yellow)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">⚽ GOALS</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppMVP" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">🏅 MVP</div>
+        </div>
+        <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:12px 8px;text-align:center">
+          <div id="ppScore" style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--cyan)">—</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Share Tech Mono',monospace">⭐ SCORE</div>
+        </div>
+      </div>
+      <!-- Win Rate bar -->
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
+          <span>Win Rate</span><span id="ppWP" style="color:var(--cyan)">0%</span>
+        </div>
+        <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+          <div id="ppWPBar" style="height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width 0.6s ease;width:0%"></div>
+        </div>
+      </div>
+      <!-- Friendly Matches -->
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:12px">🤝 FRIENDLY STATS</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFM" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">M</div>
+          </div>
+          <div style="background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFW" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">W</div>
+          </div>
+          <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFD" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--yellow)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">D</div>
+          </div>
+          <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div id="ppFL" style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--red)">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace">L</div>
+          </div>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:8px">MATCH HISTORY</div>
+        <div id="ppFriendlyList"><div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ RANKING PAGE ═══════════════ -->
+<div class="page" id="page-ranking">
+  <div class="section">
+    <div class="section-title">🏆 Player Rankings</div>
+    <div class="section-sub">// Firebase থেকে real-time data</div>
+
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <input type="text" class="form-input" id="rankSearch" placeholder="🔍 Search player..." oninput="filterRanking()" style="flex:1;min-width:200px">
+      <button class="btn btn-outline" onclick="loadRanking()">🔄 Sync</button>
+    </div>
+
+    <div id="rankingTable">
+      <div class="card text-center" style="padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:12px">📊</div>
+        <p style="color:var(--text3)">Google Sheets CSV URL set করুন code-এ SHEET_URL variable-এ।</p>
+        <p style="color:var(--text3);font-size:13px;margin-top:8px">তারপর Sync button চাপলে data load হবে।</p>
+        <button class="btn btn-gold mt-16" onclick="loadRanking()">🔄 Load Ranking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MATCHES PAGE ═══════════════ -->
+<div class="page" id="page-matches">
+  <div class="section">
+    <div class="section-title">⚽ Match Results</div>
+    <div class="section-sub">// সব official matches</div>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="nav-btn active" onclick="filterMatches('all',this)">All</button>
+      <button class="nav-btn" onclick="filterMatches('today',this)">Today</button>
+      <button class="nav-btn" onclick="filterMatches('upcoming',this)">Upcoming</button>
+      <button class="nav-btn" onclick="filterMatches('completed',this)">Completed</button>
+      <button class="nav-btn" onclick="filterMatches('friendly',this)" style="color:var(--green);border-color:rgba(0,230,118,0.3)">🤝 Friendly</button>
+    </div>
+
+    <div id="matchesList">
+      <div class="card text-center" style="padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:12px">⚽</div>
+        <p style="color:var(--text3)">Match data Google Sheets থেকে load হবে।</p>
+        <button class="btn btn-gold mt-16" onclick="loadMatches()">🔄 Load Matches</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ADMIN PANEL PAGE ═══════════════ -->
+<div class="page" id="page-admin">
+  <!-- Admin Login -->
+  <div id="adminLoginSection">
+    <div class="admin-login-box">
+      <div class="admin-login-title">🛡️ ADMIN ACCESS</div>
+      <div class="alert alert-error" id="adminLoginError"></div>
+      <div class="form-group">
+        <label class="form-label">Admin Password</label>
+        <input type="password" class="form-input" id="adminPassInput" placeholder="Password দিন" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="adminLogin()">🔐 Login</button>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminDashSection" style="display:none">
+    <div class="admin-wrap">
+      <div class="admin-header">
+        <div>
+          <div class="admin-title">🛡️ ADMIN PANEL</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:4px">TYP Championship Management</div>
+        </div>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+
+      <div class="admin-tabs">
+        <div class="admin-tab active" onclick="switchAdminTab('players')">👥 Players</div>
+        <div class="admin-tab" onclick="switchAdminTab('addmatch')">➕ Add Match Result</div>
+        <div class="admin-tab" onclick="switchAdminTab('friendlymgmt')">🤝 Friendly Requests</div>
+        <div class="admin-tab" onclick="switchAdminTab('resultmgmt')">📤 Result Requests <span id="pendingResultCount" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px">0</span></div>
+      </div>
+
+      <!-- PLAYERS TAB -->
+      <div class="admin-section active" id="adminTab-players">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="font-size:14px;color:var(--text2)">Total: <span id="adminPlayerCount" style="color:var(--cyan);font-weight:700">0</span> players</div>
+          <input type="text" class="form-input" style="max-width:240px" placeholder="🔍 Player search..." oninput="filterAdminPlayers(this.value)" id="adminSearchInput">
+        </div>
+        <div id="adminPlayersList">
+          <div class="text-center" style="padding:40px;color:var(--text3)"><span class="spinner"></span></div>
+        </div>
+      </div>
+
+      <!-- ADD MATCH TAB -->
+      <div class="admin-section" id="adminTab-addmatch">
+        <div class="card" style="max-width:600px">
+          <div style="font-size:16px;font-weight:700;color:var(--cyan);margin-bottom:20px">⚽ New Match Result</div>
+          <div class="alert alert-error" id="matchAddError"></div>
+          <div class="alert alert-success" id="matchAddSuccess"></div>
+          <div class="match-add-grid">
+            <div class="form-group">
+              <label class="form-label">Home Player</label>
+              <input type="text" class="form-input" id="mHomePlayer" placeholder="Home player name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Away Player</label>
+              <input type="text" class="form-input" id="mAwayPlayer" placeholder="Away player name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Home Score</label>
+              <input type="number" class="form-input" id="mHomeScore" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Away Score</label>
+              <input type="number" class="form-input" id="mAwayScore" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="mDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Round/Week</label>
+              <input type="text" class="form-input" id="mRound" placeholder="e.g. Week 1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tournament</label>
+            <input type="text" class="form-input" id="mTournament" placeholder="TYP Championship Season 1" value="TYP Championship">
+          </div>
+          <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="addMatchResult()">✅ Save Match Result</button>
+        </div>
+
+        <div style="margin-top:28px">
+          <div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:14px">📋 Recent Match Results</div>
+          <div id="adminMatchesList"><div style="color:var(--text3);font-size:13px">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- FRIENDLY REQUESTS ADMIN TAB -->
+      <div class="admin-section" id="adminTab-friendlymgmt">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div style="font-size:14px;color:var(--text2)">Pending: <span id="pendingRequestCount" style="color:var(--gold);font-weight:700">0</span> requests</div>
+          <button class="btn btn-outline" onclick="loadFriendlyRequests()">🔄 Refresh</button>
+        </div>
+
+        <!-- Add Friendly Match Result by Admin -->
+        <div class="card" style="max-width:600px;margin-bottom:24px;border-color:rgba(0,230,118,0.3)">
+          <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:16px">🤝 Add Friendly Match Result</div>
+          <div class="alert alert-error" id="fMatchError"></div>
+          <div class="alert alert-success" id="fMatchSuccess"></div>
+          <div class="match-add-grid">
+            <div class="form-group">
+              <label class="form-label">Home Player</label>
+              <input type="text" class="form-input" id="fHomePlayer" placeholder="Home player name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Away Player</label>
+              <input type="text" class="form-input" id="fAwayPlayer" placeholder="Away player name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Home Score</label>
+              <input type="number" class="form-input" id="fHomeScore" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Away Score</label>
+              <input type="number" class="form-input" id="fAwayScore" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="fDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note (optional)</label>
+              <input type="text" class="form-input" id="fNote" placeholder="e.g. Friendly Challenge">
+            </div>
+          </div>
+          <button class="btn btn-gold" style="width:100%;margin-top:8px;background:linear-gradient(135deg,#00e676,#00b248);color:#000" onclick="addFriendlyResult()">✅ Save Friendly Result</button>
+        </div>
+
+        <!-- Pending Requests List -->
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:14px">📨 Challenge Requests</div>
+          <div id="friendlyRequestsList"><div style="color:var(--text3);padding:20px">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- RESULT REQUESTS ADMIN TAB -->
+      <div class="admin-section" id="adminTab-resultmgmt">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div style="font-size:15px;font-weight:700;color:var(--cyan)">📤 Player Submitted Friendly Results</div>
+          <button class="btn btn-outline" onclick="loadResultRequests()">🔄 Refresh</button>
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:20px">Player নিজে result submit করে। Admin Accept করলে দুজনের Profile এ Win/Loss/Draw যোগ হবে।</p>
+        <div id="resultRequestsList"><div style="color:var(--text3);padding:20px;text-align:center">Loading...</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FRIENDLY PAGE ═══════════════ -->
+<div class="page" id="page-friendly">
+  <div class="section">
+    <div class="section-title" style="color:var(--green)">🤝 Friendly Zone</div>
+    <div class="section-sub">// Challenge other players • Track your friendly record</div>
+
+    <!-- Tabs -->
+    <div class="tabs" style="margin-bottom:0">
+      <button class="tab-btn active" onclick="switchFriendlyTab('leaderboard')">🏆 Leaderboard</button>
+      <button class="tab-btn" onclick="switchFriendlyTab('challenge')">📤 Submit Result</button>
+      <button class="tab-btn" onclick="switchFriendlyTab('results')">📋 Results</button>
+      <button class="tab-btn" onclick="switchFriendlyTab('myrequests')">📨 My Submissions</button>
+    </div>
+
+    <!-- LEADERBOARD TAB -->
+    <div class="tab-content active" id="ftab-leaderboard" style="padding-top:20px">
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <input type="text" class="form-input" id="friendlySearch" placeholder="🔍 Search player..." oninput="filterFriendlyLeaderboard()" style="flex:1">
+        <button class="btn btn-outline" style="border-color:var(--green);color:var(--green);white-space:nowrap;flex-shrink:0" onclick="loadFriendlyLeaderboard()">🔄 Sync</button>
+      </div>
+      <div id="friendlyLeaderboardTable">
+        <div class="card text-center" style="padding:60px 20px">
+          <div style="font-size:48px;margin-bottom:12px">🤝</div>
+          <p style="color:var(--text3)">Friendly leaderboard load করুন।</p>
+          <button class="btn mt-16" style="background:linear-gradient(135deg,#00e676,#00b248);color:#000;padding:12px 28px;border-radius:8px;border:none;font-weight:700;cursor:pointer" onclick="loadFriendlyLeaderboard()">🔄 Load Leaderboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGE TAB — Result Submit System -->
+    <div class="tab-content" id="ftab-challenge" style="padding-top:20px">
+      <div id="challengeLoginGate" class="card text-center" style="padding:40px">
+        <div style="font-size:48px;margin-bottom:12px">🔒</div>
+        <p style="color:var(--text3);margin-bottom:16px">Result submit করতে login করুন।</p>
+        <button class="btn btn-gold" onclick="showPage('login')">⚡ Login</button>
+      </div>
+      <div id="challengeForm" style="display:none">
+        <div style="max-width:560px;margin:0 auto">
+
+          <!-- STEP 1: Search Opponent -->
+          <div class="card" id="step1Card" style="border-color:rgba(0,230,118,0.3);margin-bottom:16px">
+            <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:14px">🔍 STEP 1 — Opponent খোঁজো</div>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-input" id="opponentSearchInput" placeholder="Name বা @username লিখো..." oninput="searchOpponentLive()" style="flex:1">
+              <button class="btn" style="background:rgba(0,230,118,0.15);border:1px solid var(--green);color:var(--green);padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap" onclick="searchOpponentLive()">🔍</button>
+            </div>
+            <div id="opponentSearchResults" style="margin-top:10px"></div>
+          </div>
+
+          <!-- STEP 2: Selected Opponent + Score -->
+          <div class="card" id="step2Card" style="border-color:rgba(0,212,255,0.3);display:none">
+            <div style="font-size:15px;font-weight:700;color:var(--cyan);margin-bottom:14px">⚽ STEP 2 — Result দাও</div>
+            <div class="alert alert-error" id="challengeError"></div>
+            <div class="alert alert-success" id="challengeSuccess"></div>
+
+            <!-- Match preview -->
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;padding:14px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">
+              <!-- My side -->
+              <div style="flex:1;text-align:center">
+                <div id="myAvatarPreview" style="width:50px;height:50px;border-radius:50%;background:var(--bg2);border:2px solid var(--gold);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">🎮</div>
+                <div id="myNamePreview" style="font-weight:700;font-size:13px;color:var(--gold)">You</div>
+                <div id="myClubPreview" style="font-size:11px;color:var(--text3)"></div>
+              </div>
+              <!-- Score inputs -->
+              <div style="text-align:center">
+                <div style="color:var(--text3);font-size:10px;margin-bottom:6px;letter-spacing:1px;font-family:'Share Tech Mono',monospace">SCORE</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <input type="number" id="myScore" min="0" max="99" placeholder="0" style="width:56px;background:var(--bg2);border:2px solid var(--gold);border-radius:8px;padding:10px 4px;color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-align:center;outline:none">
+                  <span style="font-family:'Rajdhani',sans-serif;font-size:22px;color:var(--text3)">-</span>
+                  <input type="number" id="oppScore" min="0" max="99" placeholder="0" style="width:56px;background:var(--bg2);border:2px solid var(--cyan);border-radius:8px;padding:10px 4px;color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-align:center;outline:none">
+                </div>
+              </div>
+              <!-- Opponent side -->
+              <div style="flex:1;text-align:center">
+                <div id="oppAvatarPreview" style="width:50px;height:50px;border-radius:50%;background:var(--bg2);border:2px solid var(--cyan);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">🎮</div>
+                <div id="oppNamePreview" style="font-weight:700;font-size:13px;color:var(--cyan)">Opponent</div>
+                <div id="oppClubPreview" style="font-size:11px;color:var(--text3)"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Match Date</label>
+              <input type="date" class="form-input" id="challengeDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note (optional)</label>
+              <input type="text" class="form-input" id="challengeMsg" placeholder="যেমন: Best of 3 Series • Leg 1">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn" style="flex:1;background:rgba(255,71,87,0.1);border:1px solid var(--red);color:var(--red);padding:11px;border-radius:8px;font-weight:700;cursor:pointer" onclick="clearOpponentSelection()">← Back</button>
+              <button class="btn" style="flex:2;background:linear-gradient(135deg,#00e676,#00b248);color:#000;padding:13px;border-radius:8px;border:none;font-weight:700;font-size:15px;cursor:pointer" onclick="submitFriendlyResult()">📤 Submit Result (Admin Approval)</button>
+            </div>
+            <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">⚠️ Admin approve করলেই দুজনের profile এ result add হবে।</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS TAB -->
+    <div class="tab-content" id="ftab-results" style="padding-top:20px">
+      <div id="friendlyResultsList">
+        <div class="card text-center" style="padding:60px 20px">
+          <div style="font-size:48px;margin-bottom:12px">📋</div>
+          <p style="color:var(--text3)">Friendly match results দেখতে load করুন।</p>
+          <button class="btn mt-16" style="background:linear-gradient(135deg,#00e676,#00b248);color:#000;padding:12px 28px;border-radius:8px;border:none;font-weight:700;cursor:pointer" onclick="loadFriendlyResults()">🔄 Load Results</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY REQUESTS TAB -->
+    <div class="tab-content" id="ftab-myrequests" style="padding-top:20px">
+      <div id="myRequestsLoginGate" class="card text-center" style="padding:40px">
+        <div style="font-size:48px;margin-bottom:12px">🔒</div>
+        <p style="color:var(--text3);margin-bottom:16px">তোমার requests দেখতে login করুন।</p>
+        <button class="btn btn-gold" onclick="showPage('login')">⚡ Login</button>
+      </div>
+      <div id="myRequestsList" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS EDIT MODAL -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Edit Player Stats</div>
+    <div id="modalPlayerName" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px"></div>
+    <input type="hidden" id="modalPlayerUid">
+    <div class="stats-edit-grid">
+      <div class="stats-edit-item"><label>MATCHES</label><input type="number" id="se_matches" min="0"></div>
+      <div class="stats-edit-item"><label>WINS</label><input type="number" id="se_wins" min="0"></div>
+      <div class="stats-edit-item"><label>DRAWS</label><input type="number" id="se_draws" min="0"></div>
+      <div class="stats-edit-item"><label>LOSSES</label><input type="number" id="se_losses" min="0"></div>
+      <div class="stats-edit-item"><label>GOALS FOR</label><input type="number" id="se_goalsFor" min="0"></div>
+      <div class="stats-edit-item"><label>GOALS AGAINST</label><input type="number" id="se_goalsAgainst" min="0"></div>
+      <div class="stats-edit-item"><label>CLEAN SHEETS</label><input type="number" id="se_cleanSheets" min="0"></div>
+      <div class="stats-edit-item"><label>MOTM</label><input type="number" id="se_motm" min="0"></div>
+      <div class="stats-edit-item"><label>MVP 🏅</label><input type="number" id="se_mvp" min="0"></div>
+      <div class="stats-edit-item"><label>RANK</label><input type="number" id="se_rank" min="0"></div>
+      <div class="stats-edit-item"><label>POINTS</label><input type="number" id="se_points" min="0"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn btn-gold" style="flex:1" onclick="savePlayerStats()">💾 Save Stats</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeStatsModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ════════════════════════════════════════
+// 🔥 FIREBASE CONFIG — নিজের config দাও
+// ════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyDjJ2VeApQLcZZJK0gJIUv9XfCnW_Vj9eU",
+  authDomain: "typ-chapm.firebaseapp.com",
+  databaseURL: "https://typ-chapm-default-rtdb.firebaseio.com",
+  projectId: "typ-chapm",
+  storageBucket: "typ-chapm.firebasestorage.app",
+  messagingSenderId: "458844107492",
+  appId: "1:458844107492:web:78725241c1b5a7c80132f1",
+  measurementId: "G-D4N1KH50CE"
+};
+
+// ════════════════════════════════════════
+// 📊 DATA SOURCE: Firebase Realtime Database
+
+// INIT
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// Persist login across sessions
+setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistence:', e));
+const db = getDatabase(app);
+
+let currentUser = null;
+let currentUserData = null;
+let rankingData = [];
+let matchesData = [];
+let editAvatarBase64 = null;
+let regAvatarBase64 = null;
+let allUsersCache = [];
+
+// Expose Firebase utils + shared state to non-module scripts
+window._db = db;
+window._ref = ref;
+window._get = get;
+window._set = set;
+window._child = child;
+window._allUsersCache = allUsersCache;
+
+// Shared state: second script can access currentUser/currentUserData via window
+Object.defineProperty(window, 'currentUser', {
+  get: () => currentUser,
+  set: (v) => { currentUser = v; },
+  configurable: true
+});
+Object.defineProperty(window, 'currentUserData', {
+  get: () => currentUserData,
+  set: (v) => { currentUserData = v; },
+  configurable: true
+});
+
+// ── AUTH STATE ──
+
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('loadingScreen').style.opacity = '0';
+  setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 400);
+  document.getElementById('mainNav').classList.remove('hidden');
+  // Show bottom nav after loading
+  const bnav = document.getElementById('bottomNav');
+  if (bnav) bnav.classList.remove('nav-hidden');
+
+  if (user) {
+    currentUser = user;
+    const snap = await window._get(window._child(window._ref(window._db), `users/${user.uid}`));
+    if (snap.exists()) {
+      currentUserData = snap.val();
+      updateNavUser();
+    }
+    document.getElementById('guestNav').classList.add('hidden');
+    document.getElementById('userNav').classList.remove('hidden');
+    // Admin link — শুধু তোমার email এর জন্য
+    const adminEmails = ['mf3171352@gmail.com']; // তোমার email
+    if (adminEmails.includes(user.email)) {
+      document.getElementById('adminNavLink').style.display = 'block';
+    }
+    // Home page refresh করো (admin delete button দেখাতে)
+    if (document.getElementById('page-home').classList.contains('active')) loadHomePageData();
+    // Friendly page already open হলে gate সরিয়ে দাও
+    const cg = document.getElementById('challengeLoginGate');
+    const cf = document.getElementById('challengeForm');
+    const mg = document.getElementById('myRequestsLoginGate');
+    const ml = document.getElementById('myRequestsList');
+    if (cg) cg.style.display = 'none';
+    if (cf) cf.style.display = 'block';
+    if (mg) mg.style.display = 'none';
+    if (ml) ml.style.display = 'block';
+  } else {
+    currentUser = null;
+    currentUserData = null;
+    document.getElementById('guestNav').classList.remove('hidden');
+    document.getElementById('userNav').classList.add('hidden');
+  }
+});
+
+// ── REGISTER ──
+window.register = async function() {
+  const name = document.getElementById('regName').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const club = document.getElementById('regClub').value.trim();
+  const district = document.getElementById('regDistrict').value;
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  const errEl = document.getElementById('regError');
+  const sucEl = document.getElementById('regSuccess');
+
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!name || !username || !email || !club || !district || !pass) {
+    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
+  }
+  if (pass !== pass2) {
+    errEl.textContent = '❌ Password match করেনি।'; errEl.classList.add('show'); return;
+  }
+  if (pass.length < 6) {
+    errEl.textContent = '❌ Password কমপক্ষে ৬ character।'; errEl.classList.add('show'); return;
+  }
+
+  // Check username unique
+  const usernameSnap = await window._get(window._child(window._ref(window._db), `usernames/${username}`));
+  if (usernameSnap.exists()) {
+    errEl.textContent = '❌ এই username already নেওয়া হয়েছে।'; errEl.classList.add('show'); return;
+  }
+
+  const btn = document.getElementById('regBtn');
+  btn.innerHTML = '<span class="spinner"></span> Creating...'; btn.disabled = true;
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = cred.user.uid;
+    const joinDate = new Date().toLocaleDateString('en-BD');
+
+    const userData = {
+      uid, name, username, email, club, district,
+      avatarUrl: regAvatarBase64 || '',
+      joinDate,
+      matches: 0, wins: 0, draws: 0, losses: 0,
+      goalsFor: 0, goalsAgainst: 0, cleanSheets: 0, motm: 0,
+      rank: 0, points: 0
+    };
+
+    await window._set(window._ref(window._db, `users/${uid}`), userData);
+    await window._set(window._ref(window._db, `usernames/${username}`), uid);
+
+    currentUserData = userData;
+    sucEl.textContent = '✅ Account তৈরি হয়েছে! Welcome ' + name + '!';
+    sucEl.classList.add('show');
+    setTimeout(() => { showPage('profile'); loadProfileData(); }, 1500);
+  } catch(e) {
+    let msg = '❌ Error: ' + e.message;
+    if (e.code === 'auth/email-already-in-use') msg = '❌ এই email already registered।';
+    errEl.textContent = msg; errEl.classList.add('show');
+  }
+
+  btn.innerHTML = '🚀 Create Account'; btn.disabled = false;
+};
+
+// ── LOGIN ──
+window.login = async function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+
+  if (!email || !pass) {
+    errEl.textContent = '❌ Email ও password দিন।'; errEl.classList.add('show'); return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.innerHTML = '<span class="spinner"></span> Logging in...'; btn.disabled = true;
+
+  try {
+    await setPersistence(auth, browserLocalPersistence).catch(()=>{});
+    await signInWithEmailAndPassword(auth, email, pass);
+    const snap = await window._get(window._child(window._ref(window._db), `users/${auth.currentUser.uid}`));
+    if (snap.exists()) { currentUserData = snap.val(); updateNavUser(); }
+    showPage('profile'); loadProfileData();
+  } catch(e) {
+    let msg = '❌ Login failed.';
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') msg = '❌ Email বা password ভুল।';
+    if (e.code === 'auth/user-not-found') msg = '❌ Account পাওয়া যায়নি।';
+    if (e.code === 'auth/too-many-requests') msg = '❌ অনেক চেষ্টা হয়েছে। পরে try করুন।';
+    errEl.textContent = msg; errEl.classList.add('show');
+  }
+
+  btn.innerHTML = '⚡ Login'; btn.disabled = false;
+};
+
+// ── LOGOUT ──
+window.logout = async function() {
+  await signOut(auth);
+  currentUser = null; currentUserData = null;
+  document.getElementById('userDropdown').classList.remove('show');
+  showPage('home');
+};
+
+// ── RESET PASSWORD ──
+window.resetPassword = async function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) { alert('Email address টাইপ করুন।'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert('✅ Password reset email পাঠানো হয়েছে!');
+  } catch(e) { alert('❌ Error: ' + e.message); }
+};
+
+// ── LOAD PROFILE ──
+window.loadProfileData = function() {
+  if (!currentUserData) return;
+  const d = currentUserData;
+
+  // Header
+  const avatarEl = document.getElementById('profileAvatar');
+  if (d.avatarUrl) avatarEl.innerHTML = `<img src="${d.avatarUrl}">`;
+  else avatarEl.textContent = '🎮';
+
+  document.getElementById('profileRank').textContent = `#${d.rank || '—'} • TYP PLAYER`;
+  document.getElementById('profileName').textContent = d.name;
+  document.getElementById('profileClub').textContent = d.club;
+  document.getElementById('profileDistrict').textContent = d.district;
+  document.getElementById('profileJoined').textContent = 'Joined ' + d.joinDate;
+
+  // Stats
+  const m = d.matches || 0, w = d.wins || 0, dr = d.draws || 0, l = d.losses || 0;
+  const gf = d.goalsFor || 0, ga = d.goalsAgainst || 0, cs = d.cleanSheets || 0;
+  const motm = d.motm || 0;
+  const pts = (w * 3) + (dr * 1);
+  const wp = m > 0 ? ((w/m)*100).toFixed(1) : '0.0';
+
+  document.getElementById('pM').textContent = m;
+  document.getElementById('pW').textContent = w;
+  document.getElementById('pD').textContent = dr;
+  document.getElementById('pL').textContent = l;
+  document.getElementById('pWP').textContent = wp + '%';
+  document.getElementById('pGF').textContent = gf;
+  document.getElementById('pGA').textContent = ga;
+  document.getElementById('pCS').textContent = cs;
+  document.getElementById('pMOTM').textContent = motm;
+  document.getElementById('pPTS').textContent = pts;
+
+  // Details
+  if (m > 0) {
+    document.getElementById('noStatsMsg').classList.add('hidden');
+    document.getElementById('statsDetail').classList.remove('hidden');
+    document.getElementById('detWR').textContent = wp + '%';
+    document.getElementById('detAvgG').textContent = (gf/m).toFixed(2);
+    document.getElementById('detCSR').textContent = ((cs/m)*100).toFixed(1) + '%';
+  }
+
+  // Achievements
+  buildAchievements(d);
+
+  // Edit form prefill
+  document.getElementById('editName').value = d.name || '';
+  document.getElementById('editClub').value = d.club || '';
+  document.getElementById('editDistrict').value = d.district || '';
+  const ea = document.getElementById('editAvatarPreview');
+  if (d.avatarUrl) ea.innerHTML = `<img src="${d.avatarUrl}">`;
+};
+
+// ── ACHIEVEMENTS ──
+function buildAchievements(d) {
+  const grid = document.getElementById('achievementsGrid');
+  const achievements = [
+    { icon: '⚽', label: 'First Match', condition: d.matches >= 1, color: '#00e676' },
+    { icon: '🏆', label: '10 Wins', condition: d.wins >= 10, color: '#f5a623' },
+    { icon: '🔥', label: '50 Wins', condition: d.wins >= 50, color: '#f5a623' },
+    { icon: '👑', label: '100 Wins', condition: d.wins >= 100, color: '#ffd166' },
+    { icon: '🛡️', label: '10 Clean Sheets', condition: d.cleanSheets >= 10, color: '#00d4ff' },
+    { icon: '🎯', label: 'MOTM Award', condition: d.motm >= 1, color: '#ff6b9d' },
+    { icon: '⭐', label: '50 Matches', condition: d.matches >= 50, color: '#a78bfa' },
+    { icon: '💎', label: '100 Matches', condition: d.matches >= 100, color: '#a78bfa' },
+  ];
+  grid.innerHTML = achievements.map(a => `
+    <div class="card" style="text-align:center;padding:20px 12px;opacity:${a.condition?1:0.3};${a.condition?`border-color:${a.color}33`:''};transition:all 0.2s">
+      <div style="font-size:32px;margin-bottom:8px">${a.icon}</div>
+      <div style="font-size:12px;font-weight:700;color:${a.condition?a.color:'var(--text3)'};">${a.label}</div>
+      ${a.condition ? '<div style="font-size:10px;color:var(--green);margin-top:4px">✅ Earned</div>' : '<div style="font-size:10px;color:var(--text3);margin-top:4px">Locked</div>'}
+    </div>
+  `).join('');
+}
+
+// ── SAVE PROFILE ──
+window.saveProfile = async function() {
+  if (!currentUser) return;
+  const name = document.getElementById('editName').value.trim();
+  const club = document.getElementById('editClub').value.trim();
+  const district = document.getElementById('editDistrict').value;
+  const errEl = document.getElementById('editError');
+  const sucEl = document.getElementById('editSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!name || !club || !district) {
+    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
+  }
+
+  const updates = { name, club, district };
+  if (editAvatarBase64) updates.avatarUrl = editAvatarBase64;
+
+  await window._set(window._ref(window._db, `users/${currentUser.uid}`), { ...currentUserData, ...updates });
+  currentUserData = { ...currentUserData, ...updates };
+  updateNavUser();
+  sucEl.textContent = '✅ Profile update হয়েছে!'; sucEl.classList.add('show');
+  setTimeout(() => { showPage('profile'); loadProfileData(); }, 1200);
+};
+
+// ── RANKING ──
+window.loadRanking = async function() {
+  const container = document.getElementById('rankingTable');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+    const data = await res.json();
+    if (!data) {
+      container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো player নেই।</div>';
+      return;
+    }
+    rankingData = [];
+    Object.entries(data).forEach(([uid, val]) => rankingData.push({ uid, ...val }));
+    // Points (W=3,D=1) first, then score (goals*2 + mvp*3)
+    rankingData.sort((a, b) => {
+      const pa = (a.wins||0)*3 + (a.draws||0)*1;
+      const pb = (b.wins||0)*3 + (b.draws||0)*1;
+      if (pb !== pa) return pb - pa;
+      const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
+      const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
+      return sb - sa;
+    });
+    renderRanking(rankingData);
+    document.getElementById('statPlayers').textContent = rankingData.length;
+  } catch(e) {
+    console.error('Ranking error:', e);
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি। Error: ${e.message}</div>`;
+  }
+};
+
+function renderRanking(data) {
+  if (!data.length) { document.getElementById('rankingTable').innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">Data নেই।</div>'; return; }
+  const medals = ['🥇','🥈','🥉'];
+  const rows = data.map((p, i) => {
+    const rank = i + 1;
+    const medal = medals[i] || '';
+    const bg = rank <= 3 ? `background:linear-gradient(90deg,rgba(245,166,35,${0.08-i*0.02}),transparent)` : '';
+    const pts = (p.wins||0)*3 + (p.draws||0);
+    const m = p.matches || 0;
+    const wp = m > 0 ? ((p.wins||0)/m*100).toFixed(1) : '0.0';
+    const gd = (p.goalsFor||0) - (p.goalsAgainst||0);
+    const avatar = p.avatarUrl
+      ? `<img src="${p.avatarUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border);vertical-align:middle;margin-right:8px">`
+      : `<span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);align-items:center;justify-content:center;font-size:14px;margin-right:8px;vertical-align:middle">🎮</span>`;
+    return `<tr style="${bg}">
+      <td style="padding:12px 16px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:${rank<=3?'var(--gold)':'var(--text3)'};">${medal} ${rank}</td>
+      <td style="padding:12px 16px;">
+        <div style="display:flex;align-items:center;cursor:pointer" onclick="openPublicProfile('${p.uid}')">
+          ${avatar}
+          <div>
+            <div style="font-weight:600;color:var(--cyan);text-decoration:underline dotted;text-underline-offset:3px">${p.name||'—'}</div>
+            <div style="font-size:11px;color:var(--text3)">${p.club||'—'} • ${p.district||'—'}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:12px 16px;text-align:center">${m}</td>
+      <td style="padding:12px 16px;text-align:center;color:var(--green)">${p.wins||0}</td>
+      <td style="padding:12px 16px;text-align:center">${p.draws||0}</td>
+      <td style="padding:12px 16px;text-align:center;color:var(--red)">${p.losses||0}</td>
+      <td style="padding:12px 16px;text-align:center;color:${gd>=0?'var(--green)':'var(--red)'}">${gd>0?'+':''}${gd}</td>
+      <td style="padding:12px 16px;text-align:center;color:var(--cyan)">${wp}%</td>
+      <td style="padding:12px 16px;text-align:center;color:var(--yellow);font-weight:700">${p.goalsFor||0}</td>
+      <td style="padding:12px 16px;text-align:center;color:var(--gold);font-weight:700">${p.mvp||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--cyan)">${(p.goalsFor||0)*2 + (p.mvp||0)*3}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('rankingTable').innerHTML = `
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table style="width:100%;border-collapse:collapse;background:var(--card);min-width:600px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="padding:12px 16px;text-align:left;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px">#</th>
+            <th style="padding:12px 16px;text-align:left;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px">PLAYER</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">M</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--green);font-family:'Share Tech Mono',monospace">W</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--yellow);font-family:'Share Tech Mono',monospace">D</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--red);font-family:'Share Tech Mono',monospace">L</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">GD</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--cyan);font-family:'Share Tech Mono',monospace">WIN%</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--yellow);font-family:'Share Tech Mono',monospace">⚽ GOALS</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--gold);font-family:'Share Tech Mono',monospace">🏅 MVP</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--cyan);font-family:'Share Tech Mono',monospace">⭐ SCORE</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+window.filterRanking = function() {
+  const q = document.getElementById('rankSearch').value.toLowerCase();
+  const filtered = rankingData.filter(p => (p.name||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q));
+  renderRanking(filtered);
+};
+
+// ── MATCHES ──
+window.loadMatches = async function() {
+  const container = document.getElementById('matchesList');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span></div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'matches'));
+    if (!snap.exists()) {
+      container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো match নেই।</div>';
+      return;
+    }
+    matchesData = [];
+    snap.forEach(c => matchesData.push({ id: c.key, ...c.val() }));
+    // Date দিয়ে sort — নতুন আগে
+    matchesData.sort((a, b) => (b.date||'').localeCompare(a.date||''));
+    renderMatches(matchesData);
+    const completed = matchesData.filter(m => m.status === 'completed').length;
+    document.getElementById('statMatches').textContent = completed;
+  } catch(e) {
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Data load হয়নি।</div>`;
+  }
+};
+
+function renderMatches(data) {
+  if (!data.length) { document.getElementById('matchesList').innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো match নেই।</div>'; return; }
+  document.getElementById('matchesList').innerHTML = data.map(m => {
+    const done = m.status === 'completed';
+    const hs = parseInt(m.home_score)||0, as_ = parseInt(m.away_score)||0;
+    let glow = done ? (hs>as_ ? 'rgba(0,212,255,0.1)' : hs<as_ ? 'rgba(255,71,87,0.1)' : 'rgba(255,209,102,0.1)') : 'transparent';
+    return `<div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,${glow},var(--card))">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;display:flex;justify-content:space-between">
+        <span>🏆 ${m.tournament||'—'} • ${m.round||''}</span>
+        <span>📅 ${m.date||''}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="flex:1;text-align:right">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">${m.home_team||'—'}</div>
+        </div>
+        <div style="text-align:center;padding:8px 20px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);min-width:80px">
+          ${done ? `<div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--gold)">${hs} - ${as_}</div>`
+          : `<div style="font-size:13px;color:var(--cyan);font-family:'Share Tech Mono',monospace">VS</div>`}
+          <div style="font-size:10px;color:${done?'var(--green)':'var(--yellow)'};margin-top:2px">${done?'FT':'Upcoming'}</div>
+        </div>
+        <div style="flex:1;text-align:left">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">${m.away_team||'—'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filterMatches = function(type, btn) {
+  document.querySelectorAll('#page-matches .nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const today = new Date().toISOString().split('T')[0];
+  let filtered = matchesData;
+  if (type === 'today') filtered = matchesData.filter(m => m.date === today);
+  else if (type === 'upcoming') filtered = matchesData.filter(m => m.status !== 'completed');
+  else if (type === 'completed') filtered = matchesData.filter(m => m.status === 'completed');
+  else if (type === 'friendly') filtered = matchesData.filter(m => (m.tournament||'').toLowerCase().includes('friendly') || (m.match_type||'') === 'friendly');
+  renderMatches(filtered);
+};
+
+// ── CSV PARSER ──
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,'').toLowerCase().replace(/ /g,'_'));
+  return lines.slice(1).map(line => {
+    const vals = line.split(',').map(v => v.trim().replace(/"/g,''));
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    return obj;
+  });
+}
+
+// ── NAV USER UPDATE ──
+function updateNavUser() {
+  if (!currentUserData) return;
+  const btn = document.getElementById('navAvatarBtn');
+  if (currentUserData.avatarUrl) btn.innerHTML = `<img src="${currentUserData.avatarUrl}">`;
+  document.getElementById('dropdownName').textContent = currentUserData.name || 'Player';
+  document.getElementById('dropdownClub').textContent = currentUserData.club || '—';
+  updateBnavAvatar();
+}
+
+// ── TOGGLE DROPDOWN ──
+window.toggleDropdown = function() {
+  document.getElementById('userDropdown').classList.toggle('show');
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-menu')) document.getElementById('userDropdown').classList.remove('show');
+});
+
+// ── AVATAR PREVIEW ──
+window.previewAvatar = function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { alert('File size 2MB এর বেশি।'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    regAvatarBase64 = e.target.result;
+    document.getElementById('avatarPreview').innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.previewEditAvatar = function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    editAvatarBase64 = e.target.result;
+    document.getElementById('editAvatarPreview').innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+// ── TABS ──
+window.switchTab = function(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'friendly') loadProfileFriendlyMatches();
+};
+
+async function loadProfileFriendlyMatches() {
+  const container = document.getElementById('friendlyMatchesList');
+  if (!currentUserData) return;
+  const myName = currentUserData.name;
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyMatches.json');
+    const data = await res.json();
+    if (!data) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
+    const matches = Object.entries(data)
+      .map(([id, m]) => ({ id, ...m }))
+      .filter(m => m.home_team === myName || m.away_team === myName)
+      .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
+    if (!matches.length) { container.innerHTML = '<div style="text-align:center;color:var(--text3);padding:40px">🤝 কোনো friendly match নেই।</div>'; return; }
+    container.innerHTML = matches.map(m => {
+      const isHome = m.home_team === myName;
+      const myScore = isHome ? m.home_score : m.away_score;
+      const oppScore = isHome ? m.away_score : m.home_score;
+      const oppName = isHome ? m.away_team : m.home_team;
+      const result = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
+      const rc = result === 'W' ? 'var(--green)' : result === 'L' ? 'var(--red)' : 'var(--yellow)';
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="font-size:13px;color:var(--text2)">${m.date||'—'}</div>
+        <div style="flex:1;text-align:center">
+          <div style="font-weight:700;font-size:15px">${myName} <span style="color:var(--text3)">vs</span> ${oppName}</div>
+          <div style="font-size:20px;font-weight:900;color:var(--cyan);margin-top:4px">${myScore} - ${oppScore}</div>
+          ${m.note ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">${m.note}</div>` : ''}
+        </div>
+        <div style="font-size:18px;font-weight:900;color:${rc};background:rgba(0,0,0,0.2);padding:6px 12px;border-radius:8px">${result}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="text-align:center;color:var(--red);padding:20px">Error loading.</div>';
+  }
+}
+
+// ════════════════════════════════════════
+// 🛡️ ADMIN PANEL
+// ════════════════════════════════════════
+const ADMIN_PASSWORD = 'TYP@Admin2026'; // এখানে তোমার password change করো
+let allPlayersCache = [];
+
+window.adminLogin = function() {
+  const pass = document.getElementById('adminPassInput').value;
+  const errEl = document.getElementById('adminLoginError');
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminDashSection').style.display = 'block';
+    loadAllPlayers();
+    loadAdminMatches();
+    loadResultRequests();
+  } else {
+    errEl.textContent = '❌ Password ভুল!'; errEl.classList.add('show');
+  }
+};
+
+window.switchAdminTab = function(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelector(`[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
+  document.getElementById('adminTab-' + tab).classList.add('active');
+  if (tab === 'addmatch') loadAdminMatches();
+  if (tab === 'friendlymgmt') loadFriendlyRequests();
+  if (tab === 'resultmgmt') loadResultRequests();
+};
+
+async function loadAllPlayers() {
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  if (!data) {
+    document.getElementById('adminPlayersList').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো player নেই।</div>';
+    return;
+  }
+  allPlayersCache = [];
+  Object.entries(data).forEach(([uid, val]) => allPlayersCache.push({ uid, ...val }));
+  allPlayersCache.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  document.getElementById('adminPlayerCount').textContent = allPlayersCache.length;
+  renderAdminPlayers(allPlayersCache);
+}
+
+function renderAdminPlayers(players) {
+  if (!players.length) {
+    document.getElementById('adminPlayersList').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">কোনো player পাওয়া যায়নি।</div>';
+    return;
+  }
+  document.getElementById('adminPlayersList').innerHTML = players.map(p => `
+    <div class="player-admin-card">
+      <div class="player-admin-avatar">${p.avatarUrl ? `<img src="${p.avatarUrl}">` : '🎮'}</div>
+      <div class="player-admin-info">
+        <div class="player-admin-name">${p.name || '—'} <span style="font-size:11px;color:var(--text3)">@${p.username||'—'}</span></div>
+        <div class="player-admin-meta">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'} • M:${p.matches||0} W:${p.wins||0} D:${p.draws||0} L:${p.losses||0} • PTS:${p.points||0}</div>
+      </div>
+      <div class="player-admin-actions">
+        <button class="btn-admin-edit" onclick="openStatsModal('${p.uid}')">✏️ Edit Stats</button>
+        <button class="btn-admin-del" onclick="deletePlayer('${p.uid}','${(p.name||'').replace(/'/g,'')}')" >🗑️ Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.filterAdminPlayers = function(q) {
+  const filtered = allPlayersCache.filter(p =>
+    (p.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.username||'').toLowerCase().includes(q.toLowerCase()) ||
+    (p.club||'').toLowerCase().includes(q.toLowerCase())
+  );
+  renderAdminPlayers(filtered);
+};
+
+window.openStatsModal = function(uid) {
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+  document.getElementById('modalPlayerUid').value = uid;
+  document.getElementById('modalPlayerName').textContent = `${p.name} (@${p.username})`;
+  document.getElementById('se_matches').value = p.matches || 0;
+  document.getElementById('se_wins').value = p.wins || 0;
+  document.getElementById('se_draws').value = p.draws || 0;
+  document.getElementById('se_losses').value = p.losses || 0;
+  document.getElementById('se_goalsFor').value = p.goalsFor || 0;
+  document.getElementById('se_goalsAgainst').value = p.goalsAgainst || 0;
+  document.getElementById('se_cleanSheets').value = p.cleanSheets || 0;
+  document.getElementById('se_motm').value = p.motm || 0;
+  document.getElementById('se_mvp').value = p.mvp || 0;
+  document.getElementById('se_rank').value = p.rank || 0;
+  document.getElementById('se_points').value = p.points || 0;
+  document.getElementById('statsModal').classList.add('show');
+};
+
+window.closeStatsModal = function() {
+  document.getElementById('statsModal').classList.remove('show');
+};
+
+window.savePlayerStats = async function() {
+  const uid = document.getElementById('modalPlayerUid').value;
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (!p) return;
+  const updates = {
+    ...p,
+    matches: parseInt(document.getElementById('se_matches').value) || 0,
+    wins: parseInt(document.getElementById('se_wins').value) || 0,
+    draws: parseInt(document.getElementById('se_draws').value) || 0,
+    losses: parseInt(document.getElementById('se_losses').value) || 0,
+    goalsFor: parseInt(document.getElementById('se_goalsFor').value) || 0,
+    goalsAgainst: parseInt(document.getElementById('se_goalsAgainst').value) || 0,
+    cleanSheets: parseInt(document.getElementById('se_cleanSheets').value) || 0,
+    motm: parseInt(document.getElementById('se_motm').value) || 0,
+    mvp: parseInt(document.getElementById('se_mvp').value) || 0,
+    rank: parseInt(document.getElementById('se_rank').value) || 0,
+    points: parseInt(document.getElementById('se_points').value) || 0,
+  };
+  await window._set(window._ref(window._db, `users/${uid}`), updates);
+  const idx = allPlayersCache.findIndex(x => x.uid === uid);
+  if (idx !== -1) allPlayersCache[idx] = updates;
+  closeStatsModal();
+  renderAdminPlayers(allPlayersCache);
+  alert('✅ Stats save হয়েছে!');
+};
+
+window.deletePlayer = async function(uid, name) {
+  if (!confirm(`"${name}" কে delete করবে? এটা undo করা যাবে না।`)) return;
+  const p = allPlayersCache.find(x => x.uid === uid);
+  if (p && p.username) await window._set(window._ref(window._db, `usernames/${p.username}`), null);
+  await window._set(window._ref(window._db, `users/${uid}`), null);
+  allPlayersCache = allPlayersCache.filter(x => x.uid !== uid);
+  document.getElementById('adminPlayerCount').textContent = allPlayersCache.length;
+  renderAdminPlayers(allPlayersCache);
+  alert('🗑️ Player delete হয়েছে।');
+};
+
+window.addMatchResult = async function() {
+  const homePlayer = document.getElementById('mHomePlayer').value.trim();
+  const awayPlayer = document.getElementById('mAwayPlayer').value.trim();
+  const homeScore = document.getElementById('mHomeScore').value;
+  const awayScore = document.getElementById('mAwayScore').value;
+  const date = document.getElementById('mDate').value;
+  const round = document.getElementById('mRound').value.trim();
+  const tournament = document.getElementById('mTournament').value.trim();
+  const errEl = document.getElementById('matchAddError');
+  const sucEl = document.getElementById('matchAddSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!homePlayer || !awayPlayer || homeScore === '' || awayScore === '' || !date) {
+    errEl.textContent = '❌ সব field পূরণ করুন।'; errEl.classList.add('show'); return;
+  }
+
+  const matchData = {
+    home_team: homePlayer,
+    away_team: awayPlayer,
+    home_score: parseInt(homeScore),
+    away_score: parseInt(awayScore),
+    date, round, tournament,
+    status: 'completed',
+    addedAt: new Date().toISOString()
+  };
+
+  const newRef = ref(db, 'matches/' + Date.now());
+  await set(newRef, matchData);
+
+  sucEl.textContent = '✅ Match result save হয়েছে!'; sucEl.classList.add('show');
+  document.getElementById('mHomePlayer').value = '';
+  document.getElementById('mAwayPlayer').value = '';
+  document.getElementById('mHomeScore').value = '';
+  document.getElementById('mAwayScore').value = '';
+  document.getElementById('mDate').value = '';
+  document.getElementById('mRound').value = '';
+  setTimeout(() => sucEl.classList.remove('show'), 3000);
+  loadAdminMatches();
+};
+
+async function loadAdminMatches() {
+  const snap = await window._get(window._ref(window._db, 'matches'));
+  const container = document.getElementById('adminMatchesList');
+  if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);font-size:13px">কোনো match নেই।</div>'; return; }
+  const matches = [];
+  snap.forEach(c => matches.push({ id: c.key, ...c.val() }));
+  matches.sort((a,b) => b.addedAt?.localeCompare(a.addedAt||'')||0);
+  container.innerHTML = matches.slice(0,20).map(m => `
+    <div class="player-admin-card" style="flex-wrap:nowrap">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px">${m.home_team} <span style="color:var(--gold)">${m.home_score} - ${m.away_score}</span> ${m.away_team}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${m.tournament||'—'} • ${m.round||'—'} • ${m.date||'—'}</div>
+      </div>
+      <button class="btn-admin-del" onclick="deleteMatch('${m.id}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+window.deleteMatch = async function(id) {
+  if (!confirm('এই match delete করবে?')) return;
+  await window._set(window._ref(window._db, `matches/${id}`), null);
+  loadAdminMatches();
+};
+
+// ════════════════════════════════════════
+// 🤝 FRIENDLY SYSTEM
+// ════════════════════════════════════════
+
+let friendlyLeaderboardData = [];
+
+// ── Friendly Tab Switcher ──
+window.switchFriendlyTab = function(name) {
+  document.querySelectorAll('#page-friendly .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#page-friendly .tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[onclick="switchFriendlyTab('${name}')"]`).classList.add('active');
+  document.getElementById('ftab-' + name).classList.add('active');
+  if (name === 'results') loadFriendlyResults();
+  if (currentUser) {
+    const cg = document.getElementById('challengeLoginGate');
+    const cf = document.getElementById('challengeForm');
+    const mg = document.getElementById('myRequestsLoginGate');
+    const ml = document.getElementById('myRequestsList');
+    if (cg) cg.style.display = 'none';
+    if (cf) cf.style.display = 'block';
+    if (mg) mg.style.display = 'none';
+    if (ml) ml.style.display = 'block';
+    if (name === 'myrequests') loadMyRequests();
+  }
+};
+
+// ── Friendly Leaderboard ──
+window.loadFriendlyLeaderboard = async function() {
+  const container = document.getElementById('friendlyLeaderboardTable');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span><p style="color:var(--text3);margin-top:12px">Loading...</p></div>';
+  try {
+    const _res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats.json');
+    const _fdata = await _res.json();
+    const snap = { exists: () => !!_fdata, forEach: (cb) => _fdata && Object.entries(_fdata).forEach(([k,v]) => cb({ key: k, val: () => v })) };
+    if (!snap.exists()) {
+      container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">🤝</div><p style="color:var(--text3)">এখনো কোনো friendly match হয়নি।</p></div>';
+      return;
+    }
+    friendlyLeaderboardData = [];
+    snap.forEach(child => friendlyLeaderboardData.push({ uid: child.key, ...child.val() }));
+    friendlyLeaderboardData.sort((a, b) => (b.pts||0) - (a.pts||0));
+    renderFriendlyLeaderboard(friendlyLeaderboardData);
+  } catch(e) {
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Load হয়নি।</div>`;
+  }
+};
+
+function renderFriendlyLeaderboard(data) {
+  const container = document.getElementById('friendlyLeaderboardTable');
+  if (!data.length) {
+    container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">🤝</div><p style="color:var(--text3)">কোনো record নেই।</p></div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  const rows = data.map((p, i) => {
+    const wp = p.m > 0 ? ((p.w/(p.m))*100).toFixed(0) : '0';
+    const gd = (p.gf||0) - (p.ga||0);
+    return `<tr style="border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='rgba(0,230,118,0.04)'" onmouseout="this.style.background='transparent'">
+      <td style="padding:12px 16px;text-align:center;font-size:${i<3?'18px':'14px'};font-family:'Rajdhani',sans-serif;font-weight:700;color:${i===0?'#f5a623':i===1?'#8ba3c7':i===2?'#cd7f32':'var(--text3)'}">
+        ${medals[i] || (i+1)}
+      </td>
+      <td style="padding:12px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--bg3);border:2px solid rgba(0,230,118,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0">
+            ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:14px;color:var(--text)">${p.name||'—'}</div>
+            <div style="font-size:11px;color:var(--text3)">${p.club||'—'}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px">${p.m||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--green)">${p.w||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--yellow)">${p.d||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--red)">${p.l||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px">${p.gf||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px">${p.ga||0}</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:13px;color:${gd>=0?'var(--green)':'var(--red)'}">${gd>=0?'+':''}${gd}</td>
+      <td style="padding:12px 16px;text-align:center;font-size:13px;color:var(--text2)">${wp}%</td>
+      <td style="padding:12px 16px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:${i===0?'var(--gold)':'var(--cyan)'}">${p.pts||0}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table style="width:100%;border-collapse:collapse;background:var(--card);min-width:600px">
+        <thead>
+          <tr style="background:var(--card2);border-bottom:1px solid var(--border)">
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">#</th>
+            <th style="padding:12px 16px;text-align:left;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">PLAYER</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">M</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--green);font-family:'Share Tech Mono',monospace">W</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--yellow);font-family:'Share Tech Mono',monospace">D</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--red);font-family:'Share Tech Mono',monospace">L</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">GF</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">GA</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">GD</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace">WIN%</th>
+            <th style="padding:12px 16px;text-align:center;font-size:11px;color:var(--cyan);font-family:'Share Tech Mono',monospace">PTS</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+window.filterFriendlyLeaderboard = function() {
+  const q = document.getElementById('friendlySearch').value.toLowerCase();
+  const filtered = friendlyLeaderboardData.filter(p =>
+    (p.name||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q)
+  );
+  renderFriendlyLeaderboard(filtered);
+};
+
+// ── Friendly Results ──
+window.loadFriendlyResults = async function() {
+  const container = document.getElementById('friendlyResultsList');
+  container.innerHTML = '<div class="text-center" style="padding:40px"><span class="spinner"></span></div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'friendlyMatches'));
+    if (!snap.exists()) {
+      container.innerHTML = '<div class="card text-center" style="padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">📋</div><p style="color:var(--text3)">কোনো friendly match result নেই এখনো।</p></div>';
+      return;
+    }
+    const results = [];
+    snap.forEach(c => results.push({ id: c.key, ...c.val() }));
+    results.sort((a,b) => (b.addedAt||'').localeCompare(a.addedAt||''));
+    container.innerHTML = results.map(m => {
+      const hs = m.home_score, as_ = m.away_score;
+      const done = hs !== undefined && as_ !== undefined;
+      return `<div class="card" style="margin-bottom:12px;border-color:rgba(0,230,118,0.2);background:linear-gradient(135deg,rgba(0,230,118,0.04),var(--card))">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px">
+          <span style="color:var(--green);font-weight:600">🤝 Friendly Challenge${m.note ? ' • ' + m.note : ''}</span>
+          <span>📅 ${m.date||'—'}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="flex:1;text-align:right"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">${m.home_team||'—'}</div></div>
+          <div style="text-align:center;padding:8px 20px;background:var(--bg3);border-radius:8px;border:1px solid rgba(0,230,118,0.3);min-width:80px">
+            ${done ? `<div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--green)">${hs} - ${as_}</div><div style="font-size:10px;color:var(--green);margin-top:2px">FT</div>`
+            : `<div style="font-size:13px;color:var(--green);font-family:'Share Tech Mono',monospace">VS</div><div style="font-size:10px;color:var(--yellow);margin-top:2px">Upcoming</div>`}
+          </div>
+          <div style="flex:1;text-align:left"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">${m.away_team||'—'}</div></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div class="card text-center" style="padding:40px;color:var(--red)">❌ Load হয়নি।</div>`;
+  }
+};
+
+// ── Opponent Search (Live) ──
+let selectedOpponent = null;
+
+window.searchOpponentLive = async function() {
+  const q = document.getElementById('opponentSearchInput').value.trim().toLowerCase();
+  const container = document.getElementById('opponentSearchResults');
+
+  if (q.length < 1) { container.innerHTML = ''; return; }
+
+  container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">🔄 Loading players...</div>';
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  const allUsers = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
+  window._allUsersCache = allUsers; // keep for selectOpponent
+
+  const filtered = allUsers.filter(p => {
+    if (currentUser && p.uid === currentUser.uid) return false; // exclude self
+    return (p.name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
+  }).slice(0, 8);
+
+  if (!filtered.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px">❌ কোনো player পাওয়া যায়নি।</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => `
+    <div onclick="selectOpponent('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--bg3);transition:all 0.15s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+        ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${p.name||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">@${p.username||'—'}</span></div>
+        <div style="font-size:11px;color:var(--text3)">🏟️ ${p.club||'—'} • 📍 ${p.district||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">M:${p.matches||0} W:${p.wins||0} D:${p.draws||0} L:${p.losses||0}</div>
+      </div>
+      <div style="font-size:13px;color:var(--green)">➜ Select</div>
+    </div>
+  `).join('');
+};
+
+window.selectOpponent = function(uid) {
+  const p = (window._allUsersCache||[]).find(x => x.uid === uid);
+  if (!p) return;
+  selectedOpponent = p;
+
+  // Fill step 2 preview
+  const myAvEl = document.getElementById('myAvatarPreview');
+  const oppAvEl = document.getElementById('oppAvatarPreview');
+  if (currentUserData?.avatarUrl) myAvEl.innerHTML = `<img src="${currentUserData.avatarUrl}" style="width:100%;height:100%;object-fit:cover">`;
+  if (p.avatarUrl) oppAvEl.innerHTML = `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">`;
+  document.getElementById('myNamePreview').textContent = currentUserData?.name || 'You';
+  document.getElementById('myClubPreview').textContent = currentUserData?.club || '';
+  document.getElementById('oppNamePreview').textContent = p.name || '—';
+  document.getElementById('oppClubPreview').textContent = p.club || '';
+
+  // Show step 2
+  document.getElementById('step1Card').style.display = 'none';
+  document.getElementById('step2Card').style.display = 'block';
+};
+
+window.clearOpponentSelection = function() {
+  selectedOpponent = null;
+  document.getElementById('step1Card').style.display = 'block';
+  document.getElementById('step2Card').style.display = 'none';
+  document.getElementById('myScore').value = '';
+  document.getElementById('oppScore').value = '';
+  document.getElementById('challengeDate').value = '';
+  document.getElementById('challengeMsg').value = '';
+  document.getElementById('challengeError').classList.remove('show');
+  document.getElementById('challengeSuccess').classList.remove('show');
+};
+
+// ── Submit Friendly Result (Player) ──
+window.submitFriendlyResult = async function() {
+  if (!currentUser || !currentUserData) { alert('Login করুন।'); return; }
+  if (!selectedOpponent) { alert('Opponent select করুন।'); return; }
+
+  const myS = document.getElementById('myScore').value;
+  const oppS = document.getElementById('oppScore').value;
+  const date = document.getElementById('challengeDate').value;
+  const note = document.getElementById('challengeMsg').value.trim();
+  const errEl = document.getElementById('challengeError');
+  const sucEl = document.getElementById('challengeSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (myS === '' || oppS === '') { errEl.textContent = '❌ Score দিন।'; errEl.classList.add('show'); return; }
+  if (!date) { errEl.textContent = '❌ Date দিন।'; errEl.classList.add('show'); return; }
+
+  const ms = parseInt(myS), os = parseInt(oppS);
+  const myResult = ms > os ? 'w' : ms < os ? 'l' : 'd';
+  const oppResult = ms < os ? 'w' : ms > os ? 'l' : 'd';
+
+  const resultData = {
+    submittedBy: currentUser.uid,
+    submitterName: currentUserData.name,
+    submitterUsername: currentUserData.username || '',
+    submitterClub: currentUserData.club || '—',
+    submitterAvatar: '',
+    opponentUid: selectedOpponent.uid,
+    opponentName: selectedOpponent.name,
+    opponentUsername: selectedOpponent.username || '',
+    opponentClub: selectedOpponent.club || '—',
+    opponentAvatar: '',
+    submitterScore: ms,
+    opponentScore: os,
+    submitterResult: myResult,
+    opponentResult: oppResult,
+    date, note,
+    status: 'pending',
+    submittedAt: new Date().toISOString()
+  };
+
+  try {
+    await window._set(window._ref(window._db, 'friendlyResultRequests/' + Date.now()), resultData);
+    sucEl.textContent = '✅ Result submit হয়েছে! Admin approve করলে profile এ যোগ হবে।';
+    sucEl.classList.add('show');
+    setTimeout(() => {
+      clearOpponentSelection();
+      sucEl.classList.remove('show');
+      loadMyRequests();
+    }, 3000);
+  } catch(e) {
+    errEl.textContent = '❌ Error: ' + e.message; errEl.classList.add('show');
+  }
+};
+
+// ── My Submissions (updated) ──
+window.loadMyRequests = async function() {
+  if (!currentUser) return;
+  const container = document.getElementById('myRequestsList');
+  container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'friendlyResultRequests'));
+    if (!snap.exists()) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">কোনো submission নেই।</div>'; return; }
+    const myReqs = [];
+    snap.forEach(c => {
+      const d = { id: c.key, ...c.val() };
+      if (d.submittedBy === currentUser.uid) myReqs.push(d);
+    });
+    myReqs.sort((a,b) => (b.submittedAt||'').localeCompare(a.submittedAt||''));
+    if (!myReqs.length) { container.innerHTML = '<div class="card text-center" style="padding:40px;color:var(--text3)">তুমি এখনো কোনো result submit করোনি।</div>'; return; }
+    container.innerHTML = myReqs.map(r => {
+      const statusColor = r.status === 'accepted' ? 'var(--green)' : r.status === 'declined' ? 'var(--red)' : 'var(--yellow)';
+      const statusLabel = r.status === 'accepted' ? '✅ Approved' : r.status === 'declined' ? '❌ Declined' : '⏳ Pending';
+      const resColor = r.submitterResult === 'w' ? 'var(--green)' : r.submitterResult === 'l' ? 'var(--red)' : 'var(--yellow)';
+      const resLabel = r.submitterResult === 'w' ? '🏆 WIN' : r.submitterResult === 'l' ? '💀 LOSS' : '🤝 DRAW';
+      return `<div class="card" style="margin-bottom:12px;border-color:rgba(0,230,118,0.2)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-weight:700;font-size:14px">vs <span style="color:var(--cyan)">${r.opponentName}</span> <span style="font-size:12px;color:var(--text3)">@${r.opponentUsername||'—'}</span></div>
+            <div style="font-size:13px;font-weight:700;color:${resColor};margin-top:4px">${resLabel} &nbsp; <span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:18px">${r.submitterScore} – ${r.opponentScore}</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">📅 ${r.date||'—'} ${r.note ? '• '+r.note : ''}</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:${statusColor};padding:4px 12px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${statusLabel}</div>
+        </div>
+        ${r.adminNote ? `<div style="margin-top:8px;font-size:12px;color:var(--text2);background:var(--bg3);padding:8px 12px;border-radius:6px">📝 Admin: ${r.adminNote}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:20px">❌ Error loading.</div>`;
+  }
+};
+
+// ── Admin: Load Result Requests ──
+window.loadResultRequests = async function() {
+  const container = document.getElementById('resultRequestsList');
+  container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
+  try {
+    const _res = await fetch("https://typ-chapm-default-rtdb.firebaseio.com/friendlyResultRequests.json");
+    const _data = await _res.json();
+    if (!_data) { container.innerHTML = "<div style=\"color:var(--text3);padding:20px;text-align:center\">কোনো result submission নেই।</div>"; document.getElementById("pendingResultCount").textContent = "0"; return; }
+    const reqs = [];
+    Object.entries(_data).forEach(([k, v]) => reqs.push({ id: k, ...v }));
+    reqs.sort((a,b) => (b.submittedAt||'').localeCompare(a.submittedAt||''));
+    const pending = reqs.filter(r => r.status === 'pending').length;
+    document.getElementById('pendingResultCount').textContent = pending;
+
+    container.innerHTML = reqs.map(r => {
+      const statusColor = r.status === 'accepted' ? 'var(--green)' : r.status === 'declined' ? 'var(--red)' : 'var(--yellow)';
+      return `<div class="player-admin-card" style="flex-direction:column;align-items:flex-start;gap:10px;border-color:rgba(0,212,255,0.2)">
+        <!-- Match display -->
+        <div style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--bg3);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+              ${r.submitterAvatar ? `<img src="${r.submitterAvatar}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--gold)">${r.submitterName||'—'}</div>
+              <div style="font-size:11px;color:var(--text3)">${r.submitterClub||'—'}</div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:6px 16px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)">${r.submitterScore} – ${r.opponentScore}</div>
+            <div style="font-size:10px;color:var(--text3)">📅 ${r.date||'—'}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;justify-content:flex-end">
+            <div style="text-align:right">
+              <div style="font-weight:700;font-size:13px;color:var(--cyan)">${r.opponentName||'—'}</div>
+              <div style="font-size:11px;color:var(--text3)">${r.opponentClub||'—'}</div>
+            </div>
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--bg3);border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+              ${r.opponentAvatar ? `<img src="${r.opponentAvatar}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+            </div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22;white-space:nowrap">${r.status||'pending'}</span>
+        </div>
+        ${r.note ? `<div style="font-size:11px;color:var(--text3)">📝 "${r.note}"</div>` : ''}
+        <div style="font-size:11px;color:var(--text3)">Submitted by: ${r.submitterName} @${r.submitterUsername||'—'} • ${r.submittedAt ? new Date(r.submittedAt).toLocaleString('en-BD') : '—'}</div>
+        ${r.status === 'pending' ? `
+        <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
+          <input type="text" class="form-input" id="rNote_${r.id}" placeholder="Admin note (optional)" style="flex:1;min-width:160px;font-size:12px;padding:7px 10px">
+          <button class="btn-admin-edit" style="background:rgba(0,230,118,0.1);border-color:var(--green);color:var(--green)" onclick="approveResult('${r.id}')">✅ Approve & Apply</button>
+          <button class="btn-admin-del" onclick="declineResult('${r.id}')">❌ Decline</button>
+        </div>` : `<div style="font-size:11px;color:var(--text3)">${r.adminNote ? '📝 Note: '+r.adminNote : ''}</div>`}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:20px">❌ Error loading.</div>`;
+  }
+};
+
+// ── Admin: Approve Result → Apply to friendly stats only ──
+window.approveResult = async function(id) {
+  const note = document.getElementById('rNote_' + id)?.value.trim() || '';
+  const snap = await window._get(window._ref(window._db, 'friendlyResultRequests/' + id));
+  if (!snap.exists()) { alert('Result not found.'); return; }
+  const r = snap.val();
+
+  // Only update friendlyStats (NOT main player profile/ranking)
+  await updateFriendlyStats(r.submitterName, r.submitterScore, r.opponentScore, r.submitterResult);
+  await updateFriendlyStats(r.opponentName, r.opponentScore, r.submitterScore, r.opponentResult);
+
+  // Save friendly match record
+  const matchId = 'fr_' + id;
+  await window._set(window._ref(window._db, 'friendlyMatches/' + matchId), {
+    home_team: r.submitterName, away_team: r.opponentName,
+    home_score: r.submitterScore, away_score: r.opponentScore,
+    date: r.date, note: r.note || '', match_type: 'friendly',
+    status: 'completed', addedAt: new Date().toISOString()
+  });
+
+  // Mark result as accepted
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'accepted');
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note || 'Approved');
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/approvedAt'), new Date().toISOString());
+
+  allUsersCache = [];
+  alert(`✅ Approved! Friendly leaderboard এ result add হয়েছে।`);
+  loadResultRequests();
+};
+
+window.declineResult = async function(id) {
+  const note = document.getElementById('rNote_' + id)?.value.trim() || '';
+  if (!confirm('এই result decline করবে?')) return;
+  await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/status'), 'declined');
+  if (note) await window._set(window._ref(window._db, 'friendlyResultRequests/' + id + '/adminNote'), note);
+  loadResultRequests();
+};
+
+// ── Admin: Load Friendly Requests ──
+window.loadFriendlyRequests = async function() {
+  const container = document.getElementById('friendlyRequestsList');
+  container.innerHTML = '<div class="text-center" style="padding:30px"><span class="spinner"></span></div>';
+  try {
+    const snap = await window._get(window._ref(window._db, 'friendlyRequests'));
+    if (!snap.exists()) { container.innerHTML = '<div style="color:var(--text3);padding:20px">কোনো request নেই।</div>'; document.getElementById('pendingRequestCount').textContent = '0'; return; }
+    const reqs = [];
+    snap.forEach(c => reqs.push({ id: c.key, ...c.val() }));
+    reqs.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    const pending = reqs.filter(r => r.status === 'pending').length;
+    document.getElementById('pendingRequestCount').textContent = pending;
+    container.innerHTML = reqs.map(r => {
+      const statusColor = r.status === 'accepted' ? 'var(--green)' : r.status === 'declined' ? 'var(--red)' : 'var(--yellow)';
+      return `<div class="player-admin-card" style="flex-direction:column;align-items:flex-start;gap:10px;border-color:rgba(0,230,118,0.2)">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid rgba(0,230,118,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+            ${r.fromAvatar ? `<img src="${r.fromAvatar}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px">${r.fromName||'—'} <span style="color:var(--text3);font-weight:400;font-size:12px">(${r.fromClub||'—'})</span></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">⚔️ Wants to challenge: <span style="color:var(--cyan);font-weight:600">${r.opponent}</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">📅 ${r.preferredDate||'—'}${r.message ? ' • "'+r.message+'"' : ''}</div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${statusColor};padding:3px 10px;border-radius:20px;border:1px solid ${statusColor};background:${statusColor}22">${r.status||'pending'}</span>
+        </div>
+        ${r.status === 'pending' ? `
+        <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
+          <input type="text" class="form-input" id="adminNote_${r.id}" placeholder="Admin note (optional)" style="flex:1;min-width:160px;font-size:12px;padding:7px 10px">
+          <button class="btn-admin-edit" style="background:rgba(0,230,118,0.1);border-color:var(--green);color:var(--green)" onclick="updateRequestStatus('${r.id}','accepted')">✅ Accept</button>
+          <button class="btn-admin-del" onclick="updateRequestStatus('${r.id}','declined')">❌ Decline</button>
+        </div>` : `<div style="font-size:11px;color:var(--text3)">${r.adminNote ? '📝 Note: '+r.adminNote : ''}</div>`}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:20px">❌ Error loading requests.</div>`;
+  }
+};
+
+window.updateRequestStatus = async function(id, status) {
+  const note = document.getElementById('adminNote_' + id)?.value.trim() || '';
+  await window._set(window._ref(window._db, `friendlyRequests/${id}/status`), status);
+  if (note) await window._set(window._ref(window._db, `friendlyRequests/${id}/adminNote`), note);
+  loadFriendlyRequests();
+};
+
+// ── Admin: Add Friendly Result ──
+window.addFriendlyResult = async function() {
+  const homePlayer = document.getElementById('fHomePlayer').value.trim();
+  const awayPlayer = document.getElementById('fAwayPlayer').value.trim();
+  const homeScore = document.getElementById('fHomeScore').value;
+  const awayScore = document.getElementById('fAwayScore').value;
+  const date = document.getElementById('fDate').value;
+  const note = document.getElementById('fNote').value.trim();
+  const errEl = document.getElementById('fMatchError');
+  const sucEl = document.getElementById('fMatchSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+
+  if (!homePlayer || !awayPlayer || homeScore === '' || awayScore === '' || !date) {
+    errEl.textContent = '❌ সব required field পূরণ করুন।'; errEl.classList.add('show'); return;
+  }
+
+  const hs = parseInt(homeScore), as_ = parseInt(awayScore);
+  const matchId = 'f_' + Date.now();
+
+  const matchData = {
+    home_team: homePlayer, away_team: awayPlayer,
+    home_score: hs, away_score: as_,
+    date, note, match_type: 'friendly',
+    status: 'completed', addedAt: new Date().toISOString()
+  };
+
+  await window._set(window._ref(window._db, `friendlyMatches/${matchId}`), matchData);
+
+  // Also push to main matches for the Matches page Friendly filter
+  await window._set(window._ref(window._db, `matches/${matchId}`), {
+    ...matchData, tournament: 'Friendly Challenge', round: 'Friendly'
+  });
+
+  // Update friendlyStats for home player
+  await updateFriendlyStats(homePlayer, hs, as_, hs > as_ ? 'w' : hs < as_ ? 'l' : 'd');
+  await updateFriendlyStats(awayPlayer, as_, hs, as_ > hs ? 'w' : as_ < hs ? 'l' : 'd');
+
+  sucEl.textContent = '✅ Friendly result save হয়েছে!'; sucEl.classList.add('show');
+  document.getElementById('fHomePlayer').value = '';
+  document.getElementById('fAwayPlayer').value = '';
+  document.getElementById('fHomeScore').value = '';
+  document.getElementById('fAwayScore').value = '';
+  document.getElementById('fDate').value = '';
+  document.getElementById('fNote').value = '';
+  setTimeout(() => sucEl.classList.remove('show'), 3000);
+};
+
+async function updateFriendlyStats(playerName, gf, ga, result) {
+  // Find player by name in users
+  const snap = await window._get(window._ref(window._db, 'users'));
+  if (!snap.exists()) return;
+  let playerData = null;
+  let playerUid = null;
+  snap.forEach(child => {
+    const d = child.val();
+    if ((d.name||'').toLowerCase() === playerName.toLowerCase() || (d.username||'').toLowerCase() === playerName.toLowerCase()) {
+      playerData = d;
+      playerUid = child.key;
+    }
+  });
+
+  const statsKey = 'fs_' + (playerUid || playerName.toLowerCase().replace(/\s+/g, '_'));
+  const _sr = await fetch(`https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`);
+  const _sd = await _sr.json();
+  const statsSnap = { exists: () => !!_sd, val: () => _sd };
+  const existing = statsSnap.exists() ? statsSnap.val() : { m:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
+
+  const updated = {
+    ...existing,
+    name: playerData?.name || playerName,
+    club: playerData?.club || '—',
+    avatarUrl: playerData?.avatarUrl || '',
+    m: (existing.m||0) + 1,
+    w: (existing.w||0) + (result==='w'?1:0),
+    d: (existing.d||0) + (result==='d'?1:0),
+    l: (existing.l||0) + (result==='l'?1:0),
+    gf: (existing.gf||0) + gf,
+    ga: (existing.ga||0) + ga,
+    pts: (existing.pts||0) + (result==='w'?3:result==='d'?1:0)
+  };
+  await fetch(`https://typ-chapm-default-rtdb.firebaseio.com/friendlyStats/${statsKey}.json`, { method: 'PUT', body: JSON.stringify(updated) });
+}
+
+// Initial home page load — called here so db/ref/get are in scope
+document.addEventListener('DOMContentLoaded', () => { if (typeof loadHomePageData === 'function') loadHomePageData(); });
+// fallback if DOMContentLoaded already fired
+if (document.readyState !== 'loading') { setTimeout(() => { if (typeof loadHomePageData === 'function') loadHomePageData(); }, 0); }
+
+</script>
+
+<script>
+
+// ════════════════════════════════════════
+// 🏠 HOME PAGE DATA
+// ════════════════════════════════════════
+async function loadHomePageData() {
+  loadHomeTopPlayers();
+  loadHomeRecentMatches();
+  loadHomeStats();
+}
+
+async function loadHomeStats() {
+  try {
+    const snap = await window._get(window._ref(window._db, 'users'));
+    if (!snap.exists()) return;
+    let players = [], clubs = new Set();
+    snap.forEach(c => { const d = c.val(); players.push(d); if(d.club) clubs.add(d.club); });
+    document.getElementById('statPlayers').textContent = players.length;
+    document.getElementById('statClubs').textContent = clubs.size;
+  } catch(e) {}
+}
+
+async function loadHomeTopPlayers() {
+  const container = document.getElementById('homeTopPlayers');
+  try {
+    const users = await getAllUsers();
+    if (!users.length) { container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px">কোনো player নেই।</div>'; return; }
+    const sorted = [...users].sort((a,b) => {
+      const sa = (a.goalsFor||0)*2 + (a.mvp||0)*3;
+      const sb = (b.goalsFor||0)*2 + (b.mvp||0)*3;
+      return sb - sa;
+    }).slice(0, 6);
+
+    const medals = ['🥇','🥈','🥉','','',''];
+    container.innerHTML = sorted.map((p, i) => {
+      const score = (p.goalsFor||0)*2 + (p.mvp||0)*3;
+      const isTop3 = i < 3;
+      return `<div onclick="openPublicProfile('${p.uid}')" style="background:var(--card);border:1px solid ${isTop3?'rgba(245,166,35,0.3)':'var(--border)'};border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden" onmouseover="this.style.borderColor='var(--cyan)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='${isTop3?'rgba(245,166,35,0.3)':'var(--border)'}';this.style.transform=''">
+        ${isTop3 ? `<div style="position:absolute;top:8px;right:10px;font-size:18px">${medals[i]}</div>` : ''}
+        <div style="width:60px;height:60px;border-radius:50%;border:2px solid ${isTop3?'var(--gold)':'var(--border)'};background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;margin:0 auto 10px;${isTop3?'box-shadow:0 0 16px rgba(245,166,35,0.25)':''}">
+          ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+        </div>
+        <div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.club||'—'}</div>
+        <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:6px 4px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--cyan)">${score}</div>
+          <div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">CAREER SCORE</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    console.error('TopPlayers error:', e);
+    container.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px">❌ ${e.message}</div>`;
+  }
+}
+
+async function loadHomeRecentMatches() {
+  const container = document.getElementById('homeRecentMatches');
+  try {
+    const snap = await window._get(window._ref(window._db, 'matches'));
+    if (!snap.exists()) {
+      container.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--text3)">এখনো কোনো match নেই।</div>';
+      return;
+    }
+    const matches = [];
+    snap.forEach(c => matches.push({ id: c.key, ...c.val() }));
+    matches.sort((a,b) => (b.addedAt||b.date||'').localeCompare(a.addedAt||a.date||''));
+    const recent = matches.filter(m => m.status === 'completed').slice(0, 5);
+
+    if (!recent.length) {
+      container.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--text3)">কোনো completed match নেই।</div>';
+      return;
+    }
+
+    const isAdmin = currentUser && currentUser.email === 'mf3171352@gmail.com';
+    container.innerHTML = recent.map(m => {
+      const hs = parseInt(m.home_score)||0, as_ = parseInt(m.away_score)||0;
+      const winSide = hs > as_ ? 'home' : hs < as_ ? 'away' : 'draw';
+      return `<div class="card" style="margin-bottom:10px;padding:14px 18px;display:flex;align-items:center;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-align:right;flex:1;color:${winSide==='home'?'var(--cyan)':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.home_team||'—'}</div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;flex-shrink:0">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--gold);line-height:1">${hs} - ${as_}</div>
+              <div style="font-size:9px;color:var(--green);font-family:'Share Tech Mono',monospace">FT</div>
+            </div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-align:left;flex:1;color:${winSide==='away'?'var(--cyan)':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.away_team||'—'}</div>
+          </div>
+          <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px">${m.tournament||''}${m.round?' • '+m.round:''} • ${m.date||''}</div>
+        </div>
+        ${isAdmin ? `<button onclick="deleteMatchFromHome('${m.id}')" style="background:rgba(255,71,87,0.1);border:1px solid var(--red);color:var(--red);padding:6px 10px;border-radius:6px;font-size:13px;cursor:pointer;flex-shrink:0" title="Delete">🗑️</button>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--red)">Data load হয়নি।</div>';
+  }
+}
+
+window.deleteMatchFromHome = async function(id) {
+  if (!confirm('এই match delete করবে?')) return;
+  await window._set(window._ref(window._db, `matches/${id}`), null);
+  loadHomeRecentMatches();
+  // Admin panel list ও update করো
+  if (typeof loadAdminMatches === 'function') loadAdminMatches();
+};
+
+// ════════════════════════════════════════
+// 🔍 PUBLIC PROFILE + HOME SEARCH
+// ════════════════════════════════════════
+
+async function getAllUsers() {
+  if ((window._allUsersCache||[]).length) return window._allUsersCache;
+  const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/users.json');
+  const data = await res.json();
+  window._allUsersCache = data ? Object.entries(data).map(([uid, val]) => ({ uid, ...val })) : [];
+  return window._allUsersCache;
+}
+
+window.openPublicProfile = async function(uid) {
+  const users = await getAllUsers();
+  const p = users.find(u => u.uid === uid);
+  if (!p) return;
+
+  const modal = document.getElementById('publicProfileModal');
+  const av = document.getElementById('ppAvatar');
+  av.innerHTML = p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮';
+
+  const m = p.matches||0, w = p.wins||0, d = p.draws||0, l = p.losses||0;
+  const goals = p.goalsFor||0, mvp = p.mvp||0;
+  const score = goals*2 + mvp*3;
+  const wp = m > 0 ? ((w/m)*100).toFixed(1) : '0.0';
+
+  // Store for download
+  window._ppCurrentPlayer = p;
+  window._ppCurrentStats = { m, w, d, l, goals, mvp, score, wp, ga: p.goalsAgainst||0 };
+
+  document.getElementById('ppRank').textContent = p.rank ? `RANK #${p.rank} • TYP PLAYER` : 'TYP PLAYER';
+  document.getElementById('ppName').textContent = p.name || '—';
+  document.getElementById('ppClub').textContent = p.club || '—';
+  document.getElementById('ppDistrict').textContent = p.district || '—';
+  document.getElementById('ppM').textContent = m;
+  document.getElementById('ppW').textContent = w;
+  document.getElementById('ppD').textContent = d;
+  document.getElementById('ppL').textContent = l;
+  document.getElementById('ppGoals').textContent = goals;
+  document.getElementById('ppMVP').textContent = mvp;
+  document.getElementById('ppScore').textContent = score;
+  document.getElementById('ppWP').textContent = wp + '%';
+  setTimeout(() => { document.getElementById('ppWPBar').style.width = wp + '%'; }, 100);
+
+  // Load friendly matches
+  const flContainer = document.getElementById('ppFriendlyList');
+  flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Loading...</div>';
+  modal.classList.add('show');
+
+  try {
+    const res = await fetch('https://typ-chapm-default-rtdb.firebaseio.com/friendlyMatches.json');
+    const fdata = await res.json();
+    if (!fdata) { flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return; }
+    const pName = p.name;
+    const fmatches = Object.entries(fdata)
+      .map(([id, fm]) => ({ id, ...fm }))
+      .filter(fm => fm.home_team === pName || fm.away_team === pName)
+      .sort((a, b) => (b.addedAt||'').localeCompare(a.addedAt||''));
+    if (!fmatches.length) {
+      document.getElementById('ppFM').textContent = 0;
+      document.getElementById('ppFW').textContent = 0;
+      document.getElementById('ppFD').textContent = 0;
+      document.getElementById('ppFL').textContent = 0;
+      flContainer.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">কোনো friendly match নেই।</div>'; return;
+    }
+    // Calculate friendly stats
+    let fm_w=0, fm_d=0, fm_l=0;
+    fmatches.forEach(fm => {
+      const isHome = fm.home_team === pName;
+      const myS = isHome ? fm.home_score : fm.away_score;
+      const oppS = isHome ? fm.away_score : fm.home_score;
+      if (myS > oppS) fm_w++; else if (myS < oppS) fm_l++; else fm_d++;
+    });
+    document.getElementById('ppFM').textContent = fmatches.length;
+    document.getElementById('ppFW').textContent = fm_w;
+    document.getElementById('ppFD').textContent = fm_d;
+    document.getElementById('ppFL').textContent = fm_l;
+    flContainer.innerHTML = fmatches.map(fm => {
+      const isHome = fm.home_team === pName;
+      const myS = isHome ? fm.home_score : fm.away_score;
+      const oppS = isHome ? fm.away_score : fm.home_score;
+      const oppN = isHome ? fm.away_team : fm.home_team;
+      const res2 = myS > oppS ? 'W' : myS < oppS ? 'L' : 'D';
+      const rc = res2 === 'W' ? 'var(--green)' : res2 === 'L' ? 'var(--red)' : 'var(--yellow)';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border-radius:8px;margin-bottom:6px;font-size:13px">
+        <div style="color:var(--text3)">${fm.date||'—'}</div>
+        <div style="text-align:center;flex:1;padding:0 8px"><span style="color:var(--text2)">${pName}</span> <span style="color:var(--text3)">vs</span> <span style="color:var(--text2)">${oppN}</span><br><span style="font-weight:700;color:var(--cyan)">${myS} - ${oppS}</span></div>
+        <div style="font-weight:900;color:${rc};padding:4px 10px;border-radius:6px;background:rgba(0,0,0,0.2)">${res2}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    flContainer.innerHTML = '<div style="color:var(--red);font-size:13px;padding:10px">Error loading.</div>';
+  }
+};
+
+// ── DOWNLOAD STATS CARD — Full-photo overlay style ──
+window.downloadStatsCard = async function() {
+  const p = window._ppCurrentPlayer;
+  const s = window._ppCurrentStats;
+  if (!p || !s) return;
+
+  const btn = document.getElementById('ppDownloadBtn');
+  btn.innerHTML = '⏳ Generating...';
+  btn.disabled = true;
+
+  const W = 900, H = 1200;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // ── Load avatar ──
+  const avatarImg = await new Promise(resolve => {
+    if (!p.avatarUrl) { resolve(null); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = p.avatarUrl;
+  });
+
+  // ════════════════════════════════════════════
+  // LAYER 1: BLACK BASE
+  // ════════════════════════════════════════════
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, H);
+
+  // ════════════════════════════════════════════
+  // LAYER 2: PLAYER PHOTO — COVER FULL CARD
+  // object-fit: cover — fill entire W×H, crop center
+  // ════════════════════════════════════════════
+  if (avatarImg) {
+    const iW = avatarImg.width, iH = avatarImg.height;
+    const scale = Math.max(W / iW, H / iH); // cover (not contain)
+    const dw = iW * scale;
+    const dh = iH * scale;
+    const dx = (W - dw) / 2; // center horizontally
+    const dy = 0;             // anchor top so face shows
+    ctx.drawImage(avatarImg, dx, dy, dw, dh);
+  } else {
+    const pg = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, 500);
+    pg.addColorStop(0, '#1a1a2e'); pg.addColorStop(1, '#000000');
+    ctx.fillStyle = pg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.font = '200px serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🎮', W/2, H * 0.38);
+  }
+
+  // ════════════════════════════════════════════
+  // LAYER 3: DARK OVERLAYS (so text is readable)
+  // ════════════════════════════════════════════
+
+  // Top vignette (for logo + rank area)
+  const topFade = ctx.createLinearGradient(0, 0, 0, 200);
+  topFade.addColorStop(0, 'rgba(0,0,0,0.72)');
+  topFade.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = topFade;
+  ctx.fillRect(0, 0, W, 200);
+
+  // Bottom overlay — strong dark gradient for info panel
+  const botFade = ctx.createLinearGradient(0, H * 0.48, 0, H);
+  botFade.addColorStop(0,   'rgba(0,0,0,0)');
+  botFade.addColorStop(0.18,'rgba(0,0,0,0.55)');
+  botFade.addColorStop(0.42,'rgba(0,0,0,0.85)');
+  botFade.addColorStop(0.65,'rgba(0,0,0,0.96)');
+  botFade.addColorStop(1,   'rgba(0,0,0,1)');
+  ctx.fillStyle = botFade;
+  ctx.fillRect(0, H * 0.48, W, H * 0.52);
+
+  // Side vignettes
+  const vigL = ctx.createLinearGradient(0, 0, 160, 0);
+  vigL.addColorStop(0, 'rgba(0,0,0,0.6)'); vigL.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = vigL; ctx.fillRect(0, 0, 160, H);
+  const vigR = ctx.createLinearGradient(W - 160, 0, W, 0);
+  vigR.addColorStop(0, 'rgba(0,0,0,0)'); vigR.addColorStop(1, 'rgba(0,0,0,0.6)');
+  ctx.fillStyle = vigR; ctx.fillRect(W - 160, 0, 160, H);
+
+  // ════════════════════════════════════════════
+  // LAYER 4: TOP-LEFT — TYP LOGO (placeholder)
+  // ════════════════════════════════════════════
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px Arial Black, Arial, sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('⚡ TYP', 32, 32);
+
+  // ════════════════════════════════════════════
+  // LAYER 4b: TOP-RIGHT — RANK
+  // ════════════════════════════════════════════
+  if (p.rank) {
+    ctx.fillStyle = '#f5c842';
+    ctx.font = 'bold 56px Arial Black, Arial, sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillText(`#${p.rank}`, W - 32, 28);
+  }
+
+  // ════════════════════════════════════════════
+  // LAYER 5: CLUB BADGE — centered, lower-mid
+  // ════════════════════════════════════════════
+  const badgeX = W / 2, badgeY = H * 0.62, badgeR = 68;
+
+  // Shadow behind badge
+  ctx.shadowColor = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur = 18;
+  ctx.beginPath(); ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2); ctx.stroke();
+
+  // Club initials
+  const clubWords = (p.club || 'TYP').trim().split(/\s+/);
+  const initials  = clubWords.map(w => w[0] || '').join('').slice(0, 4).toUpperCase();
+  const iFSize    = initials.length <= 2 ? 40 : initials.length === 3 ? 30 : 24;
+  ctx.fillStyle = '#111111';
+  ctx.font = `bold ${iFSize}px Arial Black, Arial, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(initials, badgeX, badgeY);
+
+  // ════════════════════════════════════════════
+  // LAYER 6: PLAYER NAME — big bold white
+  // ════════════════════════════════════════════
+  const nameY = badgeY + badgeR + 28;
+  const name = p.name || '—';
+  let fSize = 78;
+  ctx.font = `bold ${fSize}px Arial Black, Arial, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  while (ctx.measureText(name).width > W - 60 && fSize > 34) {
+    fSize -= 2;
+    ctx.font = `bold ${fSize}px Arial Black, Arial, sans-serif`;
+  }
+  // Text shadow for readability
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(name, W / 2, nameY);
+  ctx.shadowBlur = 0;
+
+  // ── Club | District ──
+  const subY = nameY + fSize + 10;
+  ctx.fillStyle = '#cccccc';
+  ctx.font = '28px Arial, sans-serif';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 8;
+  ctx.fillText(`${p.club || '—'}  |  ${p.district || '—'}`, W / 2, subY);
+  ctx.shadowBlur = 0;
+
+  // ── Separator ──
+  const sepY = subY + 42;
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(50, sepY); ctx.lineTo(W - 50, sepY); ctx.stroke();
+
+  // ════════════════════════════════════════════
+  // LAYER 7: STATS ROW — PL W D GF GA
+  // ════════════════════════════════════════════
+  const stats = [
+    { label: 'PL', value: s.m     },
+    { label: 'W',  value: s.w     },
+    { label: 'D',  value: s.d     },
+    { label: 'GF', value: s.goals },
+    { label: 'GA', value: s.ga    },
+  ];
+  const statsY = sepY + 18;
+  const colW   = W / stats.length;
+
+  stats.forEach((st, i) => {
+    const cx = colW * i + colW / 2;
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.font = 'bold 26px Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 6;
+    ctx.fillText(st.label, cx, statsY);
+    // Value — yellow
+    ctx.fillStyle = '#f5c842';
+    ctx.font = 'bold 82px Arial Black, Arial, sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,0.95)'; ctx.shadowBlur = 10;
+    ctx.fillText(st.value, cx, statsY + 32);
+  });
+  ctx.shadowBlur = 0;
+
+  // ════════════════════════════════════════════
+  // LAYER 8: FOOTER
+  // ════════════════════════════════════════════
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  ctx.fillStyle = 'rgba(180,180,180,0.7)';
+  ctx.font = '20px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText(`All-Time Official  |  TYP Championship  |  ${dateStr}`, W / 2, H - 22);
+
+  // ── Export ──
+  const link = document.createElement('a');
+  link.download = `${(p.name || 'player').replace(/\s+/g, '-')}_TYP-Stats.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  btn.innerHTML = '⬇ CARD';
+  btn.disabled = false;
+};
+
+// Helper: rounded rect path
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+window.closePublicProfile = function() {
+  document.getElementById('publicProfileModal').classList.remove('show');
+  document.getElementById('ppWPBar').style.width = '0%';
+};
+
+// Close on backdrop click
+document.getElementById('publicProfileModal').addEventListener('click', function(e) {
+  if (e.target === this) closePublicProfile();
+});
+
+// ── HOME PAGE SEARCH ──
+window.homeSearchPlayer = async function() {
+  const q = document.getElementById('homePlayerSearch').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('homeSearchResults');
+  if (!q) { resultsEl.style.display = 'none'; return; }
+
+  const users = await getAllUsers();
+  const filtered = users.filter(p =>
+    (p.name||'').toLowerCase().includes(q) ||
+    (p.username||'').toLowerCase().includes(q) ||
+    (p.club||'').toLowerCase().includes(q)
+  ).slice(0, 8);
+
+  if (!filtered.length) {
+    resultsEl.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px">কোনো player পাওয়া যায়নি।</div>';
+    resultsEl.style.display = 'block';
+    return;
+  }
+
+  resultsEl.innerHTML = filtered.map(p => `
+    <div onclick="openPublicProfile('${p.uid}')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0">
+        ${p.avatarUrl ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;object-fit:cover">` : '🎮'}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px;color:var(--text)">${p.name||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">@${p.username||'—'} • ${p.club||'—'} • ${p.district||'—'}</div>
+      </div>
+      <div style="font-size:11px;color:var(--cyan);font-family:'Share Tech Mono',monospace">${p.rank ? '#'+p.rank : ''}</div>
+    </div>
+  `).join('');
+  resultsEl.style.display = 'block';
+};
+
+// Search bar close on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#homePlayerSearch') && !e.target.closest('#homeSearchResults')) {
+    const r = document.getElementById('homeSearchResults');
+    if (r) r.style.display = 'none';
+  }
+});
+
+
+// ── BOTTOM NAV ──
+window.setBottomNav = function(name) {
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('bnav-' + name);
+  if (btn) btn.classList.add('active');
+};
+
+window.bnavProfile = function() {
+  if (currentUser) {
+    // Show mini menu
+    const existing = document.getElementById('bnavProfileMenu');
+    if (existing) { existing.remove(); return; }
+    const menu = document.createElement('div');
+    menu.id = 'bnavProfileMenu';
+    menu.style.cssText = 'position:fixed;bottom:70px;right:10px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:9999;min-width:160px;box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
+    menu.innerHTML = `
+      <div onclick="showPage('profile');setBottomNav('profile');document.getElementById('bnavProfileMenu').remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">👤 My Profile</div>
+      <div onclick="logout();document.getElementById('bnavProfileMenu')?.remove()" style="padding:10px 14px;cursor:pointer;border-radius:8px;color:var(--red);font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">🚪 Logout</div>
+    `;
+    document.body.appendChild(menu);
+    setTimeout(() => { document.addEventListener('click', function handler(e) { if (!menu.contains(e.target) && e.target.id !== 'bnav-profile') { menu.remove(); document.removeEventListener('click', handler); } }); }, 100);
+  } else {
+    showPage('login');
+    setBottomNav('');
+  }
+};
+
+// avatar update bottom nav profile icon
+function updateBnavAvatar() {
+  if (currentUserData && currentUserData.avatarUrl) {
+    document.getElementById('bnavProfileIcon').innerHTML = `<img src="${currentUserData.avatarUrl}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid var(--accent1)">`;
+  }
+}
+
+// ── PAGE NAVIGATION ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) {
+    page.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  // bottom nav sync
+  const bnavPages = ['home','ranking','matches','friendly','profile'];
+  if (bnavPages.includes(name)) setBottomNav(name);
+  if (name === 'home') loadHomePageData();
+  if (name === 'profile' && typeof loadProfileData === 'function') loadProfileData();
+  if (name === 'ranking') loadRanking();
+  if (name === 'matches') loadMatches();
+  if (name === 'friendly') {
+    loadFriendlyLeaderboard();
+    loadFriendlyResults();
+    if (currentUser) {
+      document.getElementById('challengeLoginGate').style.display = 'none';
+      document.getElementById('challengeForm').style.display = 'block';
+      document.getElementById('myRequestsLoginGate').style.display = 'none';
+      document.getElementById('myRequestsList').style.display = 'block';
+      loadMyRequests();
+    }
+  }
+  if (name === 'admin') {
+    document.getElementById('adminLoginSection').style.display = 'block';
+    document.getElementById('adminDashSection').style.display = 'none';
+    document.getElementById('adminPassInput').value = '';
+    document.getElementById('adminLoginError').classList.remove('show');
+  }
+}
+</script>
+
+</body>
+</html>
